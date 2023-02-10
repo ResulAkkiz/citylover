@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/common_widgets/datetime_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +24,7 @@ class _SignupPageState extends State<SignupPage> {
   ImagePicker imagePicker = ImagePicker();
   bool isErrorVisible = false;
   File? userPhoto;
-  int? choose;
+  int choose = 0;
   @override
   void initState() {
     super.initState();
@@ -101,7 +102,9 @@ class _SignupPageState extends State<SignupPage> {
                               visible: isErrorVisible,
                               child: const Center(
                                 child: Text(
-                                    'Lütfen profilinize profil fotoğrafı ekleyiniz.'),
+                                  'Lütfen profilinize profil fotoğrafı ekleyiniz.',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ))
                         ],
                       ),
@@ -288,43 +291,5 @@ class _SignupPageState extends State<SignupPage> {
         userPhoto = (File(yeniResim.path));
       }
     });
-  }
-
-  Widget buildDateTimePicker({
-    required IconData iconData,
-    required BuildContext context,
-    required void Function(DateTime) onSelected,
-    required TextEditingController controller,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      onTap: () async {
-        final date = await showDatePicker(
-            initialEntryMode: DatePickerEntryMode.calendarOnly,
-            context: context,
-            initialDatePickerMode: DatePickerMode.year,
-            initialDate: DateTime.now().subtract(const Duration(days: 6 * 365)),
-            firstDate: DateTime(1923),
-            lastDate: DateTime.now().subtract(const Duration(days: 6 * 365)));
-        if (date == null) return;
-        controller.text = DateFormat('dd-MM-yyyy').format(date);
-        onSelected(date);
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "Lütfen doğum tarihinizi giriniz.";
-        }
-        return null;
-      },
-      readOnly: true,
-      controller: controller,
-      decoration: InputDecoration(
-          prefixIcon: Icon(
-            iconData,
-            color: Colors.black,
-          ),
-          hintText: controller.text == '' ? 'Doğum Tarihi' : controller.text,
-          contentPadding: const EdgeInsets.fromLTRB(74, 12, 10, 12)),
-    );
   }
 }
