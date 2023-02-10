@@ -274,7 +274,6 @@ class _SignupPageState extends State<SignupPage> {
 
   void _kameradanCek() async {
     var yeniResim = await imagePicker.pickImage(source: ImageSource.camera);
-
     setState(() {
       if (yeniResim != null) {
         userPhoto = (File(yeniResim.path));
