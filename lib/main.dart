@@ -1,6 +1,5 @@
 import 'package:citylover/app_contants/custom_theme.dart';
-import 'package:citylover/pages/authentication/signup_page.dart';
-import 'package:citylover/pages/homepage/homepage.dart';
+import 'package:citylover/pages/firstpage/first_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: customTheme,
       debugShowCheckedModeBanner: false,
-      home: const SignupPage(),
+      home: const FirstPage(),
     );
   }
 }
