@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
+import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,24 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController birthdateController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController surnameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  bool obscurePassword = true;
-  ImagePicker imagePicker = ImagePicker();
-  bool isErrorVisible = false;
-  File? userPhoto;
-  int choose = 0;
-  Map<String, IconData> genderMap = {
-    'Erkek': Icons.male,
-    'Kadın': Icons.female,
-  };
-
-  DateTime dateTime = DateTime.now();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +21,11 @@ class _HomePageState extends State<HomePage> {
           size: 48,
           color: Colors.white,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const AddSharingPage(),
+          ));
+        },
       ),
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
@@ -55,6 +40,11 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           itemBuilder: (context, index) {
             return ListTile(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const DetailSharingPage(),
+                ));
+              },
               leading: const CircleAvatar(
                 backgroundImage: NetworkImage(
                     'https://randomuser.me/api/portraits/men/75.jpg'),
