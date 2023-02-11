@@ -70,18 +70,14 @@ class _FirstPageState extends State<FirstPage> {
                   )
                 ],
               ),
-              TextButton(
+              ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const HomePage()));
                   },
-                  style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                      )),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: const StadiumBorder()),
                   child: const Text('Üye olmadan devam et...'))
             ],
           ).separated(
