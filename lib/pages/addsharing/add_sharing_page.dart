@@ -13,6 +13,7 @@ class _AddSharingPageState extends State<AddSharingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -55,15 +56,15 @@ class _AddSharingPageState extends State<AddSharingPage> {
                 onChanged: (value) {
                   setState(() {});
                 },
-                decoration: const InputDecoration(
-                    fillColor: Colors.white, filled: true),
+                decoration: InputDecoration(
+                    fillColor: Theme.of(context).primaryColor, filled: true),
                 buildCounter: (context,
                     {required currentLength, required isFocused, maxLength}) {
                   return Builder(builder: (context) {
                     Color color;
                     if (maxLength! - currentLength < 20 &&
                         maxLength - currentLength != 0) {
-                      color = Colors.yellow.shade200;
+                      color = Colors.amber;
                     } else if (maxLength - currentLength == 0) {
                       color = Colors.red;
                     } else {

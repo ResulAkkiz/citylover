@@ -60,22 +60,34 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(
-                        Icons.comment,
-                        size: 16,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '16',
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '11:12 • 11/02/2023',
                         style: TextStyle(
+                          fontSize: 10,
                           color: Colors.black54,
-                          fontSize: 12,
                         ),
-                      )
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(
+                            Icons.comment,
+                            size: 16,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '16',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 12,
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   )
                 ],

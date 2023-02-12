@@ -25,9 +25,13 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 36.0),
                     child: Column(
                       children: [
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: Image.asset('assets/images/im_city.png',
+                                scale: 5)),
                         TextFormField(
                           validator: (value) {
                             if (value!.isEmpty) {
