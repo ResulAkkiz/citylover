@@ -13,7 +13,8 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const BottomNavigationBarWidget(),
+      backgroundColor: Colors.white,
+      bottomNavigationBar: const CommentBox(),
       appBar: AppBar(
         title: const Text(
           'Paylaşım',
@@ -66,11 +67,6 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 return ListTile(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const DetailSharingPage(),
-                      ));
-                    },
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(
                           'https://randomuser.me/api/portraits/med/men/$index.jpg'),
@@ -118,15 +114,14 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   }
 }
 
-class BottomNavigationBarWidget extends StatefulWidget {
-  const BottomNavigationBarWidget({super.key});
+class CommentBox extends StatefulWidget {
+  const CommentBox({super.key});
 
   @override
-  State<BottomNavigationBarWidget> createState() =>
-      _BottomNavigationBarWidgetState();
+  State<CommentBox> createState() => _CommentBoxState();
 }
 
-class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
+class _CommentBoxState extends State<CommentBox> {
   TextEditingController commentController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -135,26 +130,54 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
       child: Material(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(
+            right: 8.0,
+            left: 8.0,
+            bottom: 2.0,
+          ),
           child: Flex(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             direction: Axis.horizontal,
             children: [
               Flexible(
                 flex: 8,
-                child: TextField(
-                  controller: commentController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(bottom: -15, left: 4),
-                    hintText: 'Yorumunu Paylaş',
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(width: 1, color: Colors.black),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(width: 1, color: Colors.black),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  child: TextField(
+                    maxLength: 350,
+                    buildCounter: (context,
+                        {required currentLength,
+                        required isFocused,
+                        maxLength}) {
+                      return Builder(builder: (context) {
+                        Color color;
+                        if (maxLength! - currentLength < 20 &&
+                            maxLength - currentLength != 0) {
+                          color = Colors.amber;
+                        } else if (maxLength - currentLength == 0) {
+                          color = Colors.red;
+                        } else {
+                          color = Colors.black54;
+                        }
+                        return Text(
+                          '$currentLength / $maxLength',
+                          style: TextStyle(color: color),
+                        );
+                      });
+                    },
+                    controller: commentController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.only(bottom: 0, left: 4),
+                      hintText: 'Yorumunu Paylaş',
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: Colors.black),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(width: 1, color: Colors.black),
+                      ),
                     ),
                   ),
                 ),

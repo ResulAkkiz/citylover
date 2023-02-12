@@ -21,28 +21,31 @@ class _FirstPageState extends State<FirstPage> {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              Column(
-                children: [
-                  DropdownButtonFormField<String>(
-                    items: const [
-                      DropdownMenuItem(
-                        child: Text('Ülke'),
-                      )
-                    ],
-                    onChanged: (value) {},
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 36.0),
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      items: const [
+                        DropdownMenuItem(
+                          child: Text('Ülke'),
+                        )
+                      ],
+                      onChanged: (value) {},
+                    ),
+                    DropdownButtonFormField<String>(
+                      items: const [
+                        DropdownMenuItem(
+                          child: Text('Şehir'),
+                        )
+                      ],
+                      onChanged: (value) {},
+                    )
+                  ],
+                ).separated(
+                  const SizedBox(
+                    height: 16,
                   ),
-                  DropdownButtonFormField<String>(
-                    items: const [
-                      DropdownMenuItem(
-                        child: Text('Şehir'),
-                      )
-                    ],
-                    onChanged: (value) {},
-                  )
-                ],
-              ).separated(
-                const SizedBox(
-                  height: 16,
                 ),
               ),
               Row(
