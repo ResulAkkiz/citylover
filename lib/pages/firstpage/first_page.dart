@@ -2,6 +2,7 @@ import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
 import 'package:citylover/pages/authentication/signup_page.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/service/country_service.dart';
 import 'package:flutter/material.dart';
 
 class FirstPage extends StatefulWidget {
@@ -12,6 +13,11 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,3 +99,25 @@ class _FirstPageState extends State<FirstPage> {
     ));
   }
 }
+
+
+ // fetchDataCountry().then((value) {
+    //   if (value["results"] is List) {
+    //     List<String> countryList = [];
+    //     for (Map<String, dynamic> element in value["results"]) {
+    //       countryList.add(element['name']);
+    //     }
+    //     debugPrint(countryList.length.toString());
+    //   }
+    // });
+
+    // fetchDataCities().then((value) {
+    //   if (value["results"] is List) {
+    //     List<String> countryList = [];
+    //     for (Map<String, dynamic> element in value["results"]) {
+    //       debugPrint(element['name']);
+    //       countryList.add(element['name']);
+    //     }
+    //     debugPrint(countryList.length.toString());
+    //   }
+    // });

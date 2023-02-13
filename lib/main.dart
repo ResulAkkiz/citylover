@@ -1,8 +1,11 @@
 import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/pages/firstpage/first_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
