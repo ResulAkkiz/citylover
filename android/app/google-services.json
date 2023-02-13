@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "634897055312",
+    "project_id": "citylover-a0f89",
+    "storage_bucket": "citylover-a0f89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634897055312:android:056a66127f40bb4e801b55",
+        "android_client_info": {
+          "package_name": "com.example.citylover"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634897055312-f6b427cv8kof8cqtqiqaktkf79ghsetq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoa0xS0eGhLeBfnPZxg7LwVuQBb5xlYSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634897055312-f6b427cv8kof8cqtqiqaktkf79ghsetq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

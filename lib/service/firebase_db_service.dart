@@ -1,11 +1,8 @@
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class FirebaseDbService {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<List<UserModel>> readAllUsers() async {
