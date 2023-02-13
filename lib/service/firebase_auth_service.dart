@@ -7,13 +7,15 @@ String errorMessage = '';
 class FirebaseAuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  Future<UserModel?> createEmailPassword(
-      {required String email,
-      required String password,
-      String? phoneNumber,
-      String? name,
-      String? surname,
-      int? role}) async {
+  Future<UserModel?> createEmailPassword({
+    required String email,
+    required String password,
+    DateTime? birthdate,
+    String? name,
+    String? surname,
+    String? userGender,
+    String? userProfilePict,
+  }) async {
     try {
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -24,6 +26,9 @@ class FirebaseAuthService {
               userEmail: userCredential.user!.email!,
               userName: name,
               userSurname: surname,
+              userBirthdate: birthdate,
+              userGender: userGender,
+              userProfilePict: userProfilePict,
             )
           : null;
     } on FirebaseAuthException catch (ex) {

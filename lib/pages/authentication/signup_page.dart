@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/common_widgets/datetime_picker_widget.dart';
+import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -35,11 +37,16 @@ class _SignupPageState extends State<SignupPage> {
     'Kadın': Icons.female,
   };
 
-  DateTime dateTime = DateTime.now();
+  DateTime birthdate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: Form(
         key: formKey,
         child: Center(
@@ -187,7 +194,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                             onSelected: (DateTime date) {
                               setState(() {
-                                dateTime = date;
+                                birthdate = date;
                               });
                             },
                             controller: birthdateController,
@@ -242,11 +249,22 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                             ),
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (userPhoto != null) {
                                   formKey.currentState!.save();
                                   if (formKey.currentState!.validate()) {
-                                    debugPrint('Başarılı');
+                                    userViewModel.createEmailPassword(
+                                        email: emailController.text,
+                                        password: passwordController.text,
+                                        birthdate: birthdate,
+                                        name: nameController.text,
+                                        surname: surnameController.text,
+                                        userGender: choose.toString(),
+                                        userProfilePict:
+                                            await userViewModel.uploadFile(
+                                                getRandomString(12),
+                                                'profilephoto',
+                                                userPhoto!));
                                   }
                                   isErrorVisible = false;
                                 } else {

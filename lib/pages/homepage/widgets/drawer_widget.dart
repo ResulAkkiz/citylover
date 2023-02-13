@@ -1,7 +1,9 @@
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_clipper.dart';
 import 'package:citylover/pages/profilepage/profile_page.dart';
+import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -13,6 +15,7 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return SafeArea(
       child: Drawer(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -132,7 +135,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       )),
                   ListTile(
                       onTap: () {
-                        debugPrint('Oturum Kapatıldı');
+                        userViewModel.signOut();
                       },
                       iconColor: Colors.black,
                       tileColor: Theme.of(context).primaryColor,

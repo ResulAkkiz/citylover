@@ -43,6 +43,7 @@ dependencies:
   provider: ^6.0.5
   http: ^0.13.5
   firebase_core: ^2.5.0
+  csc_picker: ^0.2.7
 
 dev_dependencies:
   flutter_test:
