@@ -1,5 +1,9 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/common_widgets/custom_model_sheet.dart';
+import 'package:citylover/service/firebase_auth_service.dart';
+import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
       body: Form(
         key: formKey,
@@ -73,10 +78,22 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             formKey.currentState!.save();
                             if (formKey.currentState!.validate()) {
-                              debugPrint('Başarılı');
+                              await userViewModel.signInEmailPassword(
+                                  emailController.text,
+                                  passwordController.text);
+                              if (mounted && userViewModel.user != null) {
+                                Navigator.of(context).pop();
+                              } else {
+                                if (mounted) {
+                                  buildShowModelBottomSheet(
+                                      context,
+                                      errorMessage,
+                                      Icons.question_mark_outlined);
+                                }
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(

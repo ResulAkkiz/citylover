@@ -1,8 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
+import 'dart:io';
 
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
+import 'package:flutter/material.dart';
 
 import '../service/firebase_db_service.dart';
 import '../service/firebase_storage_service.dart';
@@ -20,6 +21,32 @@ class UserViewModel extends ChangeNotifier {
     debugPrint('userviewmodel constructor method tetiklendi');
     currentUser();
   }
+
+  Future<UserModel?> createEmailPassword({
+    required String email,
+    required String password,
+    String? name,
+    String? surname,
+    DateTime? birthdate,
+    String? userGender,
+    String? userProfilePict,
+  }) async {
+    _user = await firebaseAuthService.createEmailPassword(
+      email: email,
+      password: password,
+      birthdate: birthdate,
+      name: name,
+      surname: surname,
+      userGender: userGender,
+      userProfilePict: userProfilePict,
+    );
+    notifyListeners();
+    if (_user != null) {
+      firebaseDbService.saveUser(_user!);
+    }
+    return _user;
+  }
+
   Future<UserModel?> currentUser() async {
     _user = await firebaseAuthService.currentUser();
     notifyListeners();
@@ -44,5 +71,9 @@ class UserViewModel extends ChangeNotifier {
 
   Future<UserModel?> readUser(String userId) async {
     return await firebaseDbService.readUser(userId);
+  }
+
+  Future<String> uploadFile(String userID, String fileType, File uploadedFile) {
+    return firebaseStorageService.uploadFile(userID, fileType, uploadedFile);
   }
 }
