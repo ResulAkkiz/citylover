@@ -1,8 +1,10 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodel/user_view_model.dart';
@@ -15,6 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isSharingListReady = false;
+  List<SharingModel> sharingList = [];
+  @override
+  void didChangeDependencies() {
+    getSharingsbyLocation(cityName: 'Ankara', countryName: 'Türkiye');
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
@@ -41,74 +51,91 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
       ),
       drawer: const DrawerWidget(),
-      body: SafeArea(
-        child: Center(
-            child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          itemBuilder: (context, index) {
-            return ListTile(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const DetailSharingPage(),
-                ));
-              },
-              leading: const CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://randomuser.me/api/portraits/men/75.jpg'),
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '11:12 • 11/02/2023',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.black54,
-                        ),
+      body: isSharingListReady
+          ? SafeArea(
+              child: Center(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemBuilder: (context, index) {
+                    var currentSharing = sharingList[index];
+                    return ListTile(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              DetailSharingPage(sharingModel: currentSharing),
+                        ));
+                      },
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(currentSharing.userPict),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(
-                            Icons.comment,
-                            size: 16,
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
                           Text(
-                            '16',
-                            style: TextStyle(
+                            currentSharing.sharingContent,
+                            style: const TextStyle(
                               color: Colors.black54,
                               fontSize: 12,
                             ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                DateFormat('HH:mm•dd/MM/yyyy')
+                                    .format(currentSharing.sharingDate),
+                                // '11:12 • 11/02/2023',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(
+                                    Icons.comment,
+                                    size: 16,
+                                  ),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    '16',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
                           )
                         ],
-                      ),
-                    ],
-                  )
-                ],
-              ).separated(const SizedBox(
-                height: 8,
-              )),
-            );
-          },
-          itemCount: 100,
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider(thickness: 1.2);
-          },
-        )),
-      ),
+                      ).separated(const SizedBox(
+                        height: 8,
+                      )),
+                    );
+                  },
+                  itemCount: sharingList.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider(thickness: 1.2);
+                  },
+                ),
+              ),
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
+  }
+
+  Future<void> getSharingsbyLocation(
+      {required String countryName, required String cityName}) async {
+    final userViewModel = Provider.of<UserViewModel>(context);
+    sharingList =
+        await userViewModel.getSharingsbyLocation(countryName, cityName);
+    isSharingListReady = true;
+    setState(() {});
   }
 }

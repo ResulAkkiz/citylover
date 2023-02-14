@@ -1,20 +1,52 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/string_generator.dart';
+import 'package:citylover/common_widgets/custom_model_sheet.dart';
+import 'package:citylover/models/commentmodel.dart';
+import 'package:citylover/models/sharingmodel.dart';
+import 'package:citylover/models/usermodel.dart';
+import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DetailSharingPage extends StatefulWidget {
-  const DetailSharingPage({super.key});
+  const DetailSharingPage({super.key, required this.sharingModel});
+  final SharingModel sharingModel;
 
   @override
   State<DetailSharingPage> createState() => _DetailSharingPageState();
 }
 
 class _DetailSharingPageState extends State<DetailSharingPage> {
+  late SharingModel sharingModel;
+
+  List<CommentModel> commentList = [];
+  bool isCommentsReady = false;
+  @override
+  void initState() {
+    sharingModel = widget.sharingModel;
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    getComments();
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: const CommentBox(),
+      bottomNavigationBar: Visibility(
+        visible: userViewModel.user != null,
+        child: CommentBox(
+          sharingModel: sharingModel,
+        ),
+      ),
       appBar: AppBar(
         title: const Text(
           'Paylaşım',
@@ -29,10 +61,9 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 28,
-                  backgroundImage: NetworkImage(
-                      'https://randomuser.me/api/portraits/men/75.jpg'),
+                  backgroundImage: NetworkImage(sharingModel.userPict),
                 ),
                 const SizedBox(
                   width: 12,
@@ -40,13 +71,13 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Luser Zıkka',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    Text(
+                      '${sharingModel.userName} ${sharingModel.userSurname}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      'Kocaeli/Körfez', //'$country / $province',
+                      '${sharingModel.countryName} / ${sharingModel.cityName}', //'$country / $province',
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -56,53 +87,62 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                 ),
               ],
             ),
-            const Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-              style: TextStyle(fontSize: 16),
+            Text(
+              sharingModel.sharingContent,
+              style: const TextStyle(fontSize: 16),
             ),
-            const Text('11:12 • 11/02/2023'),
+            Text(
+              DateFormat('HH:mm•dd/MM/yyyy').format(sharingModel.sharingDate),
+            ),
             const Divider(thickness: 1.2),
-            ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          'https://randomuser.me/api/portraits/med/men/$index.jpg'),
-                    ),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Bahar Gündoğdu',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 12,
+            isCommentsReady
+                ? ListView.separated(
+                    reverse: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      CommentModel currentComment = commentList[index];
+                      return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(currentComment.userPict),
                           ),
-                        ),
-                        Text(
-                          '11:12 • 11/02/2023',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
-                    ).separated(const SizedBox(
-                      height: 4,
-                    )));
-              },
-              itemCount: 25,
-              separatorBuilder: (BuildContext context, int index) {
-                return const Divider(thickness: 1.2);
-              },
-            )
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${currentComment.userName} ${currentComment.userSurname} ',
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                currentComment.commentContent,
+                                style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                DateFormat('HH:mm•dd/MM/yyyy')
+                                    .format(currentComment.commentDate),
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ).separated(const SizedBox(
+                            height: 4,
+                          )));
+                    },
+                    itemCount: commentList.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(thickness: 1.2);
+                    },
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  )
           ],
         ).separated(
           const SizedBox(
@@ -112,19 +152,50 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
       ),
     );
   }
+
+  Future<void> getComments() async {
+    final userViewModel = Provider.of<UserViewModel>(context);
+    await userViewModel.getComments(sharingModel.sharingID);
+    commentList = userViewModel.commentList;
+    debugPrint(commentList.length.toString());
+    isCommentsReady = true;
+    setState(() {});
+  }
 }
 
 class CommentBox extends StatefulWidget {
-  const CommentBox({super.key});
+  const CommentBox({
+    super.key,
+    required this.sharingModel,
+  });
+  final SharingModel sharingModel;
 
   @override
   State<CommentBox> createState() => _CommentBoxState();
 }
 
 class _CommentBoxState extends State<CommentBox> {
+  late SharingModel sharingModel;
+  late VoidCallback buttonPressed;
+  UserModel? user;
+  bool isUserReady = false;
+  @override
+  void initState() {
+    sharingModel = widget.sharingModel;
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    getUser();
+    super.didChangeDependencies();
+  }
+
   TextEditingController commentController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Padding(
       padding: MediaQuery.of(context).viewInsets,
       child: Material(
@@ -187,13 +258,41 @@ class _CommentBoxState extends State<CommentBox> {
                   child: IconButton(
                     color: Colors.amber,
                     icon: const Icon(Icons.arrow_forward_ios_outlined),
-                    onPressed:
-                        commentController.text.trim() != '' ? () {} : null,
+                    onPressed: commentController.text.trim() != ''
+                        ? () async {
+                            bool isSuccessful = await userViewModel.addComment(
+                              CommentModel(
+                                  commentID: getRandomString(15),
+                                  sharingID: sharingModel.sharingID,
+                                  userID: user!.userID,
+                                  userPict: user!.userProfilePict!,
+                                  userName: user!.userName!,
+                                  userSurname: user!.userName!,
+                                  commentDate: DateTime.now(),
+                                  commentContent: commentController.text),
+                            );
+                            if (isSuccessful && mounted) {
+                              buildShowModelBottomSheet(context,
+                                  'Yorumunuz yayınlandı.', Icons.done_outlined);
+                              commentController.clear();
+                              buttonPressed;
+                            }
+                          }
+                        : null,
                   ))
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> getUser() async {
+    final userViewModel = Provider.of<UserViewModel>(context);
+    if (userViewModel.user != null) {
+      user = await userViewModel.readUser(userViewModel.user!.userID);
+    }
+    isUserReady = true;
+    setState(() {});
   }
 }

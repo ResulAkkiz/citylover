@@ -4,6 +4,8 @@ class CommentModel {
   String userID;
   String userPict;
   String userName;
+  String userSurname;
+  String commentContent;
   DateTime commentDate;
   CommentModel({
     required this.commentID,
@@ -11,6 +13,8 @@ class CommentModel {
     required this.userID,
     required this.userPict,
     required this.userName,
+    required this.userSurname,
+    required this.commentContent,
     required this.commentDate,
   });
 
@@ -21,6 +25,8 @@ class CommentModel {
       'userID': userID,
       'userPict': userPict,
       'userName': userName,
+      'userSurname': userSurname,
+      'commentContent': commentContent,
       'commentDate': commentDate.millisecondsSinceEpoch,
     };
   }
@@ -28,10 +34,12 @@ class CommentModel {
   factory CommentModel.fromMap(Map<String, dynamic> map) {
     return CommentModel(
       commentID: map['commentID'] as String,
+      commentContent: map['commentContent'] as String,
       sharingID: map['sharingID'] as String,
       userID: map['userID'] as String,
       userPict: map['userPict'] as String,
       userName: map['userName'] as String,
+      userSurname: map['userSurname'] as String,
       commentDate:
           DateTime.fromMillisecondsSinceEpoch(map['commentDate'] as int),
     );

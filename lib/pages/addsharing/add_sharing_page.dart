@@ -155,7 +155,6 @@ class _AddSharingPageState extends State<AddSharingPage> {
       user = await userViewModel.readUser(userViewModel.user!.userID);
       isUserReady = true;
     }
-    debugPrint(user.toString());
 
     setState(() {});
   }
