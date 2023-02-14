@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
+import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
@@ -52,6 +53,10 @@ class UserViewModel extends ChangeNotifier {
     return _user;
   }
 
+  Future<List<CommentModel>> getComments(String sharingID) async {
+    return firebaseDbService.getComments(sharingID);
+  }
+
   Future<UserModel?> signInEmailPassword(String email, String password) async {
     _user = await firebaseAuthService.signInEmailPassword(email, password);
     notifyListeners();
@@ -83,5 +88,9 @@ class UserViewModel extends ChangeNotifier {
   Future<List<SharingModel>> getSharingsbyLocation(
       String countryName, String cityName) async {
     return firebaseDbService.getSharingsbyLocation(countryName, cityName);
+  }
+
+  Future<bool> addComment(CommentModel commentModel) {
+    return firebaseDbService.addComment(commentModel);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,5 +65,27 @@ class FirebaseDbService {
       sharingList.add(SharingModel.fromMap(singleSharing));
     }
     return sharingList;
+  }
+
+  Future<bool> addComment(CommentModel commentModel) async {
+    Map<String, dynamic> commentMap = commentModel.toMap();
+    await firestore
+        .collection('comments')
+        .doc(commentModel.sharingID)
+        .set({commentModel.commentID: commentMap}, SetOptions(merge: true));
+    return true;
+  }
+
+  Future<List<CommentModel>> getComments(String sharingID) async {
+    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+        await firestore.collection('comments').doc(sharingID).get();
+    Map<String, dynamic>? commentsMap = documentSnapshot.data();
+    List<CommentModel> commentList = [];
+    if (commentsMap != null) {
+      for (Map<String, dynamic> element in commentsMap.values) {
+        commentList.add(CommentModel.fromMap(element));
+      }
+    }
+    return commentList;
   }
 }
