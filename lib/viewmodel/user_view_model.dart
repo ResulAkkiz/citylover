@@ -1,12 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
-
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
-import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:flutter/material.dart';
-
 import '../service/firebase_db_service.dart';
 import '../service/firebase_storage_service.dart';
 
@@ -81,5 +78,10 @@ class UserViewModel extends ChangeNotifier {
 
   Future<String> uploadFile(String userID, String fileType, File uploadedFile) {
     return firebaseStorageService.uploadFile(userID, fileType, uploadedFile);
+  }
+
+  Future<List<SharingModel>> getSharingsbyLocation(
+      String countryName, String cityName) async {
+    return firebaseDbService.getSharingsbyLocation(countryName, cityName);
   }
 }

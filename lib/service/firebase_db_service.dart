@@ -49,4 +49,20 @@ class FirebaseDbService {
         .set(sharingMap);
     return true;
   }
+
+  Future<List<SharingModel>> getSharingsbyLocation(
+      String countryName, String cityName) async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await firestore
+        .collection('sharings')
+        .doc(countryName)
+        .collection(cityName)
+        .get();
+
+    final allSharings = querySnapshot.docs.map((doc) => doc.data()).toList();
+    List<SharingModel> sharingList = [];
+    for (Map<String, dynamic> singleSharing in allSharings) {
+      sharingList.add(SharingModel.fromMap(singleSharing));
+    }
+    return sharingList;
+  }
 }

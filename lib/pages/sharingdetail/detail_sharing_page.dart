@@ -1,15 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/models/sharingmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DetailSharingPage extends StatefulWidget {
-  const DetailSharingPage({super.key});
+  const DetailSharingPage({super.key, required this.sharingModel});
+  final SharingModel sharingModel;
 
   @override
   State<DetailSharingPage> createState() => _DetailSharingPageState();
 }
 
 class _DetailSharingPageState extends State<DetailSharingPage> {
+  late SharingModel sharingModel;
+  @override
+  void initState() {
+    sharingModel = widget.sharingModel;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,10 +39,9 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 28,
-                  backgroundImage: NetworkImage(
-                      'https://randomuser.me/api/portraits/men/75.jpg'),
+                  backgroundImage: NetworkImage(sharingModel.userPict),
                 ),
                 const SizedBox(
                   width: 12,
@@ -40,13 +49,13 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Luser Zıkka',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    Text(
+                      '${sharingModel.userName} ${sharingModel.userSurname}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      'Kocaeli/Körfez', //'$country / $province',
+                      '${sharingModel.countryName} / ${sharingModel.cityName}', //'$country / $province',
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -56,11 +65,13 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                 ),
               ],
             ),
-            const Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-              style: TextStyle(fontSize: 16),
+            Text(
+              sharingModel.sharingContent,
+              style: const TextStyle(fontSize: 16),
             ),
-            const Text('11:12 • 11/02/2023'),
+            Text(
+              DateFormat('HH:mm•dd/MM/yyyy').format(sharingModel.sharingDate),
+            ),
             const Divider(thickness: 1.2),
             ListView.separated(
               physics: const NeverScrollableScrollPhysics(),
