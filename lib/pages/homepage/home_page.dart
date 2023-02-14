@@ -3,6 +3,9 @@ import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../viewmodel/user_view_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,18 +17,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add_rounded,
-          size: 48,
-          color: Colors.white,
+      floatingActionButton: Visibility(
+        visible: userViewModel.user != null,
+        child: FloatingActionButton(
+          child: const Icon(
+            Icons.add_rounded,
+            size: 48,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const AddSharingPage(),
+            ));
+          },
         ),
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const AddSharingPage(),
-          ));
-        },
       ),
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,

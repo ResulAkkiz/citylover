@@ -1,5 +1,6 @@
 import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/pages/splashpage/splash_page.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => UserViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PlaceViewModel(),
         )
       ],
       child: MaterialApp(

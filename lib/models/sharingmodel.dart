@@ -4,6 +4,7 @@ class SharingModel {
   String userID;
   String userPict;
   String userName;
+  String userSurname;
   String countryName;
   String cityName;
   String sharingContent;
@@ -13,6 +14,7 @@ class SharingModel {
     required this.userID,
     required this.userPict,
     required this.userName,
+    required this.userSurname,
     required this.countryName,
     required this.cityName,
     required this.sharingContent,
@@ -25,6 +27,7 @@ class SharingModel {
       'userID': userID,
       'userPict': userPict,
       'userName': userName,
+      'userSurname': userSurname,
       'countryName': countryName,
       'cityName': cityName,
       'sharingContent': sharingContent,
@@ -43,6 +46,7 @@ class SharingModel {
       sharingContent: map['sharingContent'] as String,
       sharingDate:
           DateTime.fromMillisecondsSinceEpoch(map['sharingDate'] as int),
+      userSurname: map['userSurname'] as String,
     );
   }
 

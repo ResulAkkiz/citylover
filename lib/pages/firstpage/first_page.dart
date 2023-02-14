@@ -2,8 +2,10 @@ import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
 import 'package:citylover/pages/authentication/signup_page.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -17,6 +19,7 @@ class _FirstPageState extends State<FirstPage> {
   String stateValue = "";
   String cityValue = "";
   String address = "";
+  bool isErrorVisible = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -24,6 +27,8 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
+    final placeViewModel = Provider.of<PlaceViewModel>(context);
+
     return Scaffold(
         body: SafeArea(
       child: Center(
@@ -109,40 +114,27 @@ class _FirstPageState extends State<FirstPage> {
                   },
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 36.0),
-              //   child: Column(
-              //     children: [
-              //       DropdownButtonFormField<String>(
-              //         items: const [
-              //           DropdownMenuItem(
-              //             child: Text('Ülke'),
-              //           )
-              //         ],
-              //         onChanged: (value) {},
-              //       ),
-              //       DropdownButtonFormField<String>(
-              //         items: const [
-              //           DropdownMenuItem(
-              //             child: Text('Şehir'),
-              //           )
-              //         ],
-              //         onChanged: (value) {},
-              //       )
-              //     ],
-              //   ).separated(
-              //     const SizedBox(
-              //       height: 16,
-              //     ),
-              //   ),
-              // ),
+              Visibility(
+                  visible: isErrorVisible,
+                  child: const Text(
+                    'Lütfen ülke ve şehir seçiniz.',
+                    style: TextStyle(color: Colors.red),
+                  )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const SignupPage()));
+                      debugPrint(countryValue + stateValue);
+                      if (countryValue == '' || stateValue == '') {
+                        setState(() {
+                          isErrorVisible = true;
+                        });
+                      } else {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const SignupPage()));
+                        isErrorVisible = false;
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -151,8 +143,14 @@ class _FirstPageState extends State<FirstPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const LoginPage()));
+                      if (countryValue == '' || stateValue == '') {
+                        setState(() {});
+                        isErrorVisible = true;
+                      } else {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const LoginPage()));
+                        isErrorVisible = false;
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -163,8 +161,17 @@ class _FirstPageState extends State<FirstPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const HomePage()));
+                    if (countryValue == '' || stateValue == '') {
+                      setState(() {
+                        isErrorVisible = true;
+                      });
+                    } else {
+                      placeViewModel.savePlace(
+                          cityName: stateValue, countryName: countryValue);
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const HomePage()));
+                      isErrorVisible = false;
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -173,7 +180,7 @@ class _FirstPageState extends State<FirstPage> {
             ],
           ).separated(
             const SizedBox(
-              height: 36,
+              height: 24,
             ),
           ),
         ),

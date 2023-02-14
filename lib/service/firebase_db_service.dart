@@ -1,4 +1,4 @@
-import 'package:citylover/models/commentmodel.dart';
+import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -39,11 +39,14 @@ class FirebaseDbService {
     return true;
   }
 
-  Future<bool> addSharing(String userID, CommentModel comment) async {
-    Map<String, dynamic> commentMap = comment.toMap();
-    await firestore.collection('sharings').doc(userID.toString()).set(
-        {comment.commentID.toString(): commentMap}, SetOptions(merge: true));
-
+  Future<bool> addSharing(SharingModel sharingModel) async {
+    Map<String, dynamic> sharingMap = sharingModel.toMap();
+    await firestore
+        .collection('sharings')
+        .doc(sharingModel.countryName)
+        .collection(sharingModel.cityName)
+        .doc(sharingModel.sharingID)
+        .set(sharingMap);
     return true;
   }
 }

@@ -29,7 +29,7 @@ Future<dynamic> buildShowModelBottomSheet(
                   child: Text(text,
                       overflow: TextOverflow.clip,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w500,
                         fontSize: 24,
                         color: Colors.white,
                       )),
