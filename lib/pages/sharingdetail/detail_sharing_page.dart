@@ -26,14 +26,8 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   @override
   void initState() {
     sharingModel = widget.sharingModel;
-
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
     getComments();
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override
@@ -154,7 +148,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   }
 
   Future<void> getComments() async {
-    final userViewModel = Provider.of<UserViewModel>(context);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     await userViewModel.getComments(sharingModel.sharingID);
     commentList = userViewModel.commentList;
     debugPrint(commentList.length.toString());
@@ -176,7 +170,7 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   late SharingModel sharingModel;
-  late VoidCallback buttonPressed;
+
   UserModel? user;
   bool isUserReady = false;
   @override
@@ -275,7 +269,6 @@ class _CommentBoxState extends State<CommentBox> {
                               buildShowModelBottomSheet(context,
                                   'Yorumunuz yayınlandı.', Icons.done_outlined);
                               commentController.clear();
-                              buttonPressed;
                             }
                           }
                         : null,

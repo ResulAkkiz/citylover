@@ -98,4 +98,8 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
     return commentList;
   }
+
+  Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
+    return firebaseDbService.updateUser(userId, newMap);
+  }
 }
