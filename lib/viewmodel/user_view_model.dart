@@ -1,10 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
+
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:flutter/material.dart';
+
 import '../service/firebase_db_service.dart';
 import '../service/firebase_storage_service.dart';
 
@@ -21,6 +23,7 @@ class UserViewModel extends ChangeNotifier {
     debugPrint('userviewmodel constructor method tetiklendi');
     currentUser();
   }
+  List<CommentModel> commentList = [];
 
   Future<UserModel?> createEmailPassword({
     required String email,
@@ -51,10 +54,6 @@ class UserViewModel extends ChangeNotifier {
     _user = await firebaseAuthService.currentUser();
     notifyListeners();
     return _user;
-  }
-
-  Future<List<CommentModel>> getComments(String sharingID) async {
-    return firebaseDbService.getComments(sharingID);
   }
 
   Future<UserModel?> signInEmailPassword(String email, String password) async {
@@ -92,5 +91,11 @@ class UserViewModel extends ChangeNotifier {
 
   Future<bool> addComment(CommentModel commentModel) {
     return firebaseDbService.addComment(commentModel);
+  }
+
+  Future<List<CommentModel>> getComments(String sharingID) async {
+    commentList = await firebaseDbService.getComments(sharingID);
+    notifyListeners();
+    return commentList;
   }
 }

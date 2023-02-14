@@ -20,11 +20,13 @@ class DetailSharingPage extends StatefulWidget {
 
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
+
   List<CommentModel> commentList = [];
   bool isCommentsReady = false;
   @override
   void initState() {
     sharingModel = widget.sharingModel;
+
     super.initState();
   }
 
@@ -153,14 +155,19 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
 
   Future<void> getComments() async {
     final userViewModel = Provider.of<UserViewModel>(context);
-    commentList = await userViewModel.getComments(sharingModel.sharingID);
+    await userViewModel.getComments(sharingModel.sharingID);
+    commentList = userViewModel.commentList;
+    debugPrint(commentList.length.toString());
     isCommentsReady = true;
     setState(() {});
   }
 }
 
 class CommentBox extends StatefulWidget {
-  const CommentBox({super.key, required this.sharingModel});
+  const CommentBox({
+    super.key,
+    required this.sharingModel,
+  });
   final SharingModel sharingModel;
 
   @override
@@ -169,6 +176,7 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   late SharingModel sharingModel;
+  late VoidCallback buttonPressed;
   UserModel? user;
   bool isUserReady = false;
   @override
@@ -267,6 +275,7 @@ class _CommentBoxState extends State<CommentBox> {
                               buildShowModelBottomSheet(context,
                                   'Yorumunuz yayınlandı.', Icons.done_outlined);
                               commentController.clear();
+                              buttonPressed;
                             }
                           }
                         : null,
