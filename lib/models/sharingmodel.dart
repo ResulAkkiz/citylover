@@ -2,9 +2,6 @@
 class SharingModel {
   String sharingID;
   String userID;
-  String userPict;
-  String userName;
-  String userSurname;
   String countryName;
   String cityName;
   String sharingContent;
@@ -12,9 +9,6 @@ class SharingModel {
   SharingModel({
     required this.sharingID,
     required this.userID,
-    required this.userPict,
-    required this.userName,
-    required this.userSurname,
     required this.countryName,
     required this.cityName,
     required this.sharingContent,
@@ -25,9 +19,6 @@ class SharingModel {
     return <String, dynamic>{
       'sharingID': sharingID,
       'userID': userID,
-      'userPict': userPict,
-      'userName': userName,
-      'userSurname': userSurname,
       'countryName': countryName,
       'cityName': cityName,
       'sharingContent': sharingContent,
@@ -39,19 +30,16 @@ class SharingModel {
     return SharingModel(
       sharingID: map['sharingID'] as String,
       userID: map['userID'] as String,
-      userPict: map['userPict'] as String,
-      userName: map['userName'] as String,
       countryName: map['countryName'] as String,
       cityName: map['cityName'] as String,
       sharingContent: map['sharingContent'] as String,
       sharingDate:
           DateTime.fromMillisecondsSinceEpoch(map['sharingDate'] as int),
-      userSurname: map['userSurname'] as String,
     );
   }
 
   @override
   String toString() {
-    return 'SharingModel(sharingID: $sharingID, userID: $userID, userPict: $userPict, userName: $userName, countryName: $countryName, cityName: $cityName, sharingContent: $sharingContent, sharingDate: $sharingDate)';
+    return 'SharingModel(sharingID: $sharingID, userID: $userID, countryName: $countryName, cityName: $cityName, sharingContent: $sharingContent, sharingDate: $sharingDate)';
   }
 }

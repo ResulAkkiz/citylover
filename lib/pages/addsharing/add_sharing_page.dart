@@ -114,15 +114,13 @@ class _AddSharingPageState extends State<AddSharingPage> {
                           ? () async {
                               bool? isSuccessful =
                                   await userViewModel.addSharing(SharingModel(
-                                      sharingID: getRandomString(12),
-                                      userID: user!.userID,
-                                      userPict: user!.userProfilePict!,
-                                      userName: user!.userName!,
-                                      countryName: 'Türkiye',
-                                      cityName: 'Bilecik',
-                                      sharingContent: sharingController.text,
-                                      sharingDate: DateTime.now(),
-                                      userSurname: user!.userSurname!));
+                                sharingID: getRandomString(12),
+                                userID: user!.userID,
+                                countryName: 'Türkiye',
+                                cityName: 'Bilecik',
+                                sharingContent: sharingController.text,
+                                sharingDate: DateTime.now(),
+                              ));
                               if (isSuccessful && mounted) {
                                 buildShowModelBottomSheet(
                                     context,

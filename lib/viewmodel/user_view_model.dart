@@ -14,7 +14,6 @@ class UserViewModel extends ChangeNotifier {
   UserModel? _user;
 
   UserModel? get user => _user;
-
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   FirebaseDbService firebaseDbService = FirebaseDbService();
   FirebaseStorageService firebaseStorageService = FirebaseStorageService();
