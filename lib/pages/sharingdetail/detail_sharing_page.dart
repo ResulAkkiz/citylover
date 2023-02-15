@@ -21,6 +21,7 @@ class DetailSharingPage extends StatefulWidget {
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
   late UserViewModel userViewModel;
+
   bool isCommentsReady = false;
   @override
   void initState() {
@@ -101,16 +102,18 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     itemBuilder: (context, index) {
                       CommentModel currentComment =
                           userViewModel.commentList[index];
+                      Future<UserModel?> currentUser =
+                          getSingleUser(currentComment.userID);
                       return ListTile(
                           leading: CircleAvatar(
                             backgroundImage:
-                                NetworkImage(currentComment.userPict),
+                                NetworkImage(currentUser!.userProfilePict!),
                           ),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${currentComment.userName} ${currentComment.userSurname} ',
+                                '${currentUser?.userName} ${currentUser?.userSurname} ',
                                 style: const TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.w500),
                               ),
@@ -150,6 +153,15 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
         ),
       ),
     );
+  }
+
+  Future<UserModel?> getSingleUser(String userID) async {
+    UserModel? currentUser = await userViewModel.readUser(userID);
+    return currentUser;
+  }
+
+  void getUser(String userID) async {
+    await getSingleUser(userID);
   }
 
   Future<void> getComments() async {
@@ -261,9 +273,6 @@ class _CommentBoxState extends State<CommentBox> {
                                   commentID: getRandomString(15),
                                   sharingID: sharingModel.sharingID,
                                   userID: user!.userID,
-                                  userPict: user!.userProfilePict!,
-                                  userName: user!.userName!,
-                                  userSurname: user!.userName!,
                                   commentDate: DateTime.now(),
                                   commentContent: commentController.text),
                             );
