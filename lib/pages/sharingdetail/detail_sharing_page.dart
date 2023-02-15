@@ -21,6 +21,7 @@ class DetailSharingPage extends StatefulWidget {
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
   late UserViewModel userViewModel;
+  UserModel? currentUser;
 
   bool isCommentsReady = false;
   @override
@@ -102,40 +103,44 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     itemBuilder: (context, index) {
                       CommentModel currentComment =
                           userViewModel.commentList[index];
-                      Future<UserModel?> currentUser =
-                          getSingleUser(currentComment.userID);
-                      return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(currentUser!.userProfilePict!),
-                          ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${currentUser?.userName} ${currentUser?.userSurname} ',
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
+                      getSingleUser(currentComment.userID);
+                      return currentUser != null
+                          ? ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(currentUser!.userProfilePict!),
                               ),
-                              Text(
-                                currentComment.commentContent,
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                DateFormat('HH:mm•dd/MM/yyyy')
-                                    .format(currentComment.commentDate),
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ).separated(const SizedBox(
-                            height: 4,
-                          )));
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  currentUser!.userProfilePict == null
+                                      ? const Text('Yükleniyor')
+                                      : Text(
+                                          '${currentUser!.userName} ${currentUser!.userSurname} ',
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                  Text(
+                                    currentComment.commentContent,
+                                    style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat('HH:mm•dd/MM/yyyy')
+                                        .format(currentComment.commentDate),
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ).separated(const SizedBox(
+                                height: 4,
+                              )))
+                          : const Text('Yükleniyor');
                     },
                     itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
@@ -156,12 +161,11 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   }
 
   Future<UserModel?> getSingleUser(String userID) async {
-    UserModel? currentUser = await userViewModel.readUser(userID);
+    currentUser = await userViewModel.readUser(userID);
+    if (mounted) {
+      setState(() {});
+    }
     return currentUser;
-  }
-
-  void getUser(String userID) async {
-    await getSingleUser(userID);
   }
 
   Future<void> getComments() async {
