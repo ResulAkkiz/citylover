@@ -89,13 +89,18 @@ class UserViewModel extends ChangeNotifier {
     return firebaseDbService.getSharingsbyLocation(countryName, cityName);
   }
 
-  Future<bool> addComment(CommentModel commentModel) {
-    return firebaseDbService.addComment(commentModel);
+  Future<bool> addComment(CommentModel commentModel) async {
+    bool isSuccesful = await firebaseDbService.addComment(commentModel);
+    getComments(commentModel.sharingID);
+    return isSuccesful;
   }
 
-  Future<List<CommentModel>> getComments(String sharingID) async {
+  Future<void> getComments(String sharingID) async {
     commentList = await firebaseDbService.getComments(sharingID);
     notifyListeners();
-    return commentList;
+  }
+
+  Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
+    return firebaseDbService.updateUser(userId, newMap);
   }
 }

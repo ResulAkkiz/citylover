@@ -188,6 +188,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               children: [
                                 ListTile(
                                     onTap: () {
+                                      Navigator.pop(context);
                                       Navigator.of(context)
                                           .push(MaterialPageRoute(
                                         builder: (context) =>

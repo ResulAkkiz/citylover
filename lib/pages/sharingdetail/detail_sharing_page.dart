@@ -20,25 +20,25 @@ class DetailSharingPage extends StatefulWidget {
 
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
+  late UserViewModel userViewModel;
+  UserModel? currentUser;
 
-  List<CommentModel> commentList = [];
   bool isCommentsReady = false;
   @override
   void initState() {
     sharingModel = widget.sharingModel;
-
+    getComments();
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    getComments();
+    userViewModel = Provider.of<UserViewModel>(context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: Visibility(
@@ -101,41 +101,48 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      CommentModel currentComment = commentList[index];
-                      return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(currentComment.userPict),
-                          ),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${currentComment.userName} ${currentComment.userSurname} ',
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
+                      CommentModel currentComment =
+                          userViewModel.commentList[index];
+                      getSingleUser(currentComment.userID);
+                      return currentUser != null
+                          ? ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(currentUser!.userProfilePict!),
                               ),
-                              Text(
-                                currentComment.commentContent,
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                DateFormat('HH:mm•dd/MM/yyyy')
-                                    .format(currentComment.commentDate),
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ).separated(const SizedBox(
-                            height: 4,
-                          )));
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  currentUser!.userProfilePict == null
+                                      ? const Text('Yükleniyor')
+                                      : Text(
+                                          '${currentUser!.userName} ${currentUser!.userSurname} ',
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                  Text(
+                                    currentComment.commentContent,
+                                    style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat('HH:mm•dd/MM/yyyy')
+                                        .format(currentComment.commentDate),
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ).separated(const SizedBox(
+                                height: 4,
+                              )))
+                          : const Text('Yükleniyor');
                     },
-                    itemCount: commentList.length,
+                    itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       return const Divider(thickness: 1.2);
                     },
@@ -153,13 +160,18 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
     );
   }
 
+  Future<UserModel?> getSingleUser(String userID) async {
+    currentUser = await userViewModel.readUser(userID);
+    if (mounted) {
+      setState(() {});
+    }
+    return currentUser;
+  }
+
   Future<void> getComments() async {
-    final userViewModel = Provider.of<UserViewModel>(context);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     await userViewModel.getComments(sharingModel.sharingID);
-    commentList = userViewModel.commentList;
-    debugPrint(commentList.length.toString());
     isCommentsReady = true;
-    setState(() {});
   }
 }
 
@@ -176,7 +188,7 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   late SharingModel sharingModel;
-  late VoidCallback buttonPressed;
+
   UserModel? user;
   bool isUserReady = false;
   @override
@@ -265,9 +277,6 @@ class _CommentBoxState extends State<CommentBox> {
                                   commentID: getRandomString(15),
                                   sharingID: sharingModel.sharingID,
                                   userID: user!.userID,
-                                  userPict: user!.userProfilePict!,
-                                  userName: user!.userName!,
-                                  userSurname: user!.userName!,
                                   commentDate: DateTime.now(),
                                   commentContent: commentController.text),
                             );
@@ -275,7 +284,6 @@ class _CommentBoxState extends State<CommentBox> {
                               buildShowModelBottomSheet(context,
                                   'Yorumunuz yayınlandı.', Icons.done_outlined);
                               commentController.clear();
-                              buttonPressed;
                             }
                           }
                         : null,
