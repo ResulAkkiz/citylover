@@ -93,10 +93,9 @@ class UserViewModel extends ChangeNotifier {
     return firebaseDbService.addComment(commentModel);
   }
 
-  Future<List<CommentModel>> getComments(String sharingID) async {
+  Future<void> getComments(String sharingID) async {
     commentList = await firebaseDbService.getComments(sharingID);
     notifyListeners();
-    return commentList;
   }
 
   Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {

@@ -20,8 +20,7 @@ class DetailSharingPage extends StatefulWidget {
 
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
-
-  List<CommentModel> commentList = [];
+  late UserViewModel userViewModel;
   bool isCommentsReady = false;
   @override
   void initState() {
@@ -31,8 +30,13 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    userViewModel = Provider.of<UserViewModel>(context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: Visibility(
@@ -95,7 +99,8 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      CommentModel currentComment = commentList[index];
+                      CommentModel currentComment =
+                          userViewModel.commentList[index];
                       return ListTile(
                           leading: CircleAvatar(
                             backgroundImage:
@@ -129,7 +134,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                             height: 4,
                           )));
                     },
-                    itemCount: commentList.length,
+                    itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       return const Divider(thickness: 1.2);
                     },
@@ -150,10 +155,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   Future<void> getComments() async {
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     await userViewModel.getComments(sharingModel.sharingID);
-    commentList = userViewModel.commentList;
-    debugPrint(commentList.length.toString());
     isCommentsReady = true;
-    setState(() {});
   }
 }
 
