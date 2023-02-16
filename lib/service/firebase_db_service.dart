@@ -64,6 +64,7 @@ class FirebaseDbService {
     for (Map<String, dynamic> singleSharing in allSharings) {
       sharingList.add(SharingModel.fromMap(singleSharing));
     }
+    sharingList.sort((b, a) => a.sharingDate.compareTo(b.sharingDate));
     return sharingList;
   }
 
@@ -86,6 +87,7 @@ class FirebaseDbService {
         commentList.add(CommentModel.fromMap(element));
       }
     }
+    commentList.sort((a, b) => a.commentDate.compareTo(b.commentDate));
     return commentList;
   }
 }

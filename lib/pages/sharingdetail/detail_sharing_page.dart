@@ -11,8 +11,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DetailSharingPage extends StatefulWidget {
-  const DetailSharingPage({super.key, required this.sharingModel});
+  const DetailSharingPage(
+      {super.key, required this.sharingModel, required this.userModel});
   final SharingModel sharingModel;
+  final UserModel userModel;
 
   @override
   State<DetailSharingPage> createState() => _DetailSharingPageState();
@@ -21,12 +23,12 @@ class DetailSharingPage extends StatefulWidget {
 class _DetailSharingPageState extends State<DetailSharingPage> {
   late SharingModel sharingModel;
   late UserViewModel userViewModel;
-  UserModel? currentUser;
-
+  late UserModel userModel;
   bool isCommentsReady = false;
   @override
   void initState() {
     sharingModel = widget.sharingModel;
+    userModel = widget.userModel;
     getComments();
     super.initState();
   }
@@ -63,7 +65,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
               children: [
                 CircleAvatar(
                   radius: 28,
-                  backgroundImage: NetworkImage(sharingModel.userPict),
+                  backgroundImage: NetworkImage(userModel.userProfilePict!),
                 ),
                 const SizedBox(
                   width: 12,
@@ -72,7 +74,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${sharingModel.userName} ${sharingModel.userSurname}',
+                      '${userModel.userName} ${userModel.userSurname}',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.w500),
                     ),
@@ -103,44 +105,53 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     itemBuilder: (context, index) {
                       CommentModel currentComment =
                           userViewModel.commentList[index];
-                      getSingleUser(currentComment.userID);
-                      return currentUser != null
-                          ? ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(currentUser!.userProfilePict!),
-                              ),
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  currentUser!.userProfilePict == null
-                                      ? const Text('Yükleniyor')
-                                      : Text(
-                                          '${currentUser!.userName} ${currentUser!.userSurname} ',
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                  Text(
-                                    currentComment.commentContent,
-                                    style: const TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 12,
+                      return FutureBuilder(
+                          future: userViewModel.readUser(currentComment.userID),
+                          builder:
+                              (context, AsyncSnapshot<UserModel?> snapshot) {
+                            if (snapshot.hasData) {
+                              var currentUser = snapshot.data;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      currentUser!.userProfilePict!),
+                                ),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${currentUser.userName} ${currentUser.userSurname} ',
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                  ),
-                                  Text(
-                                    DateFormat('HH:mm•dd/MM/yyyy')
-                                        .format(currentComment.commentDate),
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.black54,
+                                    Text(
+                                      currentComment.commentContent,
+                                      style: const TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 12,
+                                      ),
                                     ),
+                                    Text(
+                                      DateFormat('HH:mm•dd/MM/yyyy')
+                                          .format(currentComment.commentDate),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ).separated(
+                                  const SizedBox(
+                                    height: 4,
                                   ),
-                                ],
-                              ).separated(const SizedBox(
-                                height: 4,
-                              )))
-                          : const Text('Yükleniyor');
+                                ),
+                              );
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          });
+
                     },
                     itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
@@ -158,14 +169,6 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
         ),
       ),
     );
-  }
-
-  Future<UserModel?> getSingleUser(String userID) async {
-    currentUser = await userViewModel.readUser(userID);
-    if (mounted) {
-      setState(() {});
-    }
-    return currentUser;
   }
 
   Future<void> getComments() async {
@@ -304,3 +307,53 @@ class _CommentBoxState extends State<CommentBox> {
     setState(() {});
   }
 }
+
+
+
+
+// FutureBuilder(
+//                           future: userViewModel.readUser(currentComment.userID),
+//                           builder:
+//                               (context, AsyncSnapshot<UserModel?> snapshot) {
+//                             if (snapshot.hasData) {
+//                               var currentUser = snapshot.data;
+//                               return ListTile(
+//                                 leading: CircleAvatar(
+//                                   backgroundImage: NetworkImage(
+//                                       currentUser!.userProfilePict!),
+//                                 ),
+//                                 title: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Text(
+//                                       '${currentUser.userName} ${currentUser.userSurname} ',
+//                                       style: const TextStyle(
+//                                           fontSize: 12,
+//                                           fontWeight: FontWeight.w500),
+//                                     ),
+//                                     Text(
+//                                       currentComment.commentContent,
+//                                       style: const TextStyle(
+//                                         color: Colors.black54,
+//                                         fontSize: 12,
+//                                       ),
+//                                     ),
+//                                     Text(
+//                                       DateFormat('HH:mm•dd/MM/yyyy')
+//                                           .format(currentComment.commentDate),
+//                                       style: const TextStyle(
+//                                         fontSize: 10,
+//                                         color: Colors.black54,
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ).separated(
+//                                   const SizedBox(
+//                                     height: 4,
+//                                   ),
+//                                 ),
+//                               );
+//                             } else {
+//                               return const CircularProgressIndicator();
+//                             }
+//                           })
