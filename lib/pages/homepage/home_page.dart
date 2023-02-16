@@ -1,4 +1,5 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/addsharing/add_sharing_page.dart';
@@ -126,21 +127,47 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         Row(
                                           mainAxisSize: MainAxisSize.min,
-                                          children: const [
-                                            Icon(
+                                          children: [
+                                            const Icon(
                                               Icons.comment,
                                               size: 16,
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 4,
                                             ),
-                                            Text(
-                                              '16',
-                                              style: TextStyle(
-                                                color: Colors.black54,
-                                                fontSize: 12,
-                                              ),
-                                            )
+                                            FutureBuilder(
+                                                future: userViewModel
+                                                    .getCommentsList(
+                                                        currentSharing
+                                                            .sharingID),
+                                                builder: (context,
+                                                    AsyncSnapshot snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    List<CommentModel>
+                                                        commentList =
+                                                        snapshot.data;
+                                                    int listLength =
+                                                        commentList.length;
+                                                    return Text(
+                                                      listLength.toString(),
+                                                      style: const TextStyle(
+                                                        color: Colors.black54,
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Center(
+                                                        child: Text(snapshot
+                                                            .error
+                                                            .toString()));
+                                                  } else {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  }
+                                                })
                                           ],
                                         ),
                                       ],
