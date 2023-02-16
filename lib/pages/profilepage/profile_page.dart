@@ -26,10 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController surnameController = TextEditingController();
   bool isUserReady = false;
-  DateTime dateTime = DateTime.now();
-  bool obscurePassword = true;
+  late DateTime dateTime;
   ImagePicker imagePicker = ImagePicker();
-  bool isErrorVisible = false;
   File? userPhoto;
   int choose = 0;
   UserModel? user;
@@ -69,7 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomePage()),
             (Route<dynamic> route) => false);
-        print('Ay beni tetikliyolar.');
         return true;
       },
       child: Scaffold(
@@ -158,13 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   hintText: 'Soyisim', labelText: 'Soyisim'),
                             ),
                             TextFormField(
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return "Lütfen e-mail adresinizi giriniz.";
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.emailAddress,
+                              readOnly: true,
                               controller: emailController,
                               decoration: const InputDecoration(
                                   hintText: 'E-mail', labelText: 'E-mail'),
@@ -299,8 +290,10 @@ class _ProfilePageState extends State<ProfilePage> {
       nameController.text = user!.userName ?? '';
       surnameController.text = user!.userSurname ?? '';
       emailController.text = user!.userEmail;
+      dateTime = user!.userBirthdate!;
       birthdateController.text = DateFormat('dd/MM/yyyy')
           .format(user?.userBirthdate ?? DateTime.now());
+
       choose = int.parse(user!.userGender ?? '0');
     }
     isUserReady = true;

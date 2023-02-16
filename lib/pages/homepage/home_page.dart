@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                                       currentUser!.userProfilePict!),
                                 ),
                                 title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       currentSharing.sharingContent,
@@ -155,7 +155,8 @@ class _HomePageState extends State<HomePage> {
                                 child: Text(snapshot.error.toString()),
                               );
                             } else {
-                              return const CircularProgressIndicator();
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           });
                     },
