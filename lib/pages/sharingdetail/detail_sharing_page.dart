@@ -105,7 +105,6 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     itemBuilder: (context, index) {
                       CommentModel currentComment =
                           userViewModel.commentList[index];
-
                       return FutureBuilder(
                           future: userViewModel.readUser(currentComment.userID),
                           builder:
@@ -152,6 +151,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                               return const CircularProgressIndicator();
                             }
                           });
+
                     },
                     itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
