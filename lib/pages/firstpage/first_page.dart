@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
@@ -8,6 +6,7 @@ import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class FirstPage extends StatefulWidget {
@@ -30,7 +29,8 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   void initState() {
-    getCountries();
+    //  getCountries();
+    loadExcelFile();
     // exportExcelFile();
     super.initState();
   }
@@ -157,8 +157,18 @@ class _FirstPageState extends State<FirstPage> {
     ));
   }
 
-  void getCountries() async {
-    try {
+  Future<void> loadExcelFile() async {
+    final bytes = await rootBundle.load('assets/tables/countryTable.xlsx');
+    final excel = Excel.decodeBytes(bytes.buffer.asUint8List());
+    final sheet = excel['country'];
+    for (var row in sheet.rows) {
+      for (var cell in row) {
+        print(cell?.value);
+      }
+    }
+
+    void getCountries() async {
+      /* try {
       final file = File('/assets/tables/countryTable.xlsx');
       final bytes = await file.readAsBytes();
       final excel = Excel.decodeBytes(bytes);
@@ -171,6 +181,9 @@ class _FirstPageState extends State<FirstPage> {
       }
     } catch (e) {
       print('Error: $e');
+    } */
+
+      // Read the sheet data here...
     }
     // late var bytes;
     // try {
