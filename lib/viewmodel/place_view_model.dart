@@ -33,4 +33,8 @@ class PlaceViewModel extends ChangeNotifier {
     stateNameList = await countryService.loadStates(countryID);
     notifyListeners();
   }
+
+  Future<List<LocationModel>> loadTempStates(String countryID) async {
+    return await countryService.loadStates(countryID);
+  }
 }

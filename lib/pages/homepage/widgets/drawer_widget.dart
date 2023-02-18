@@ -24,15 +24,25 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   UserModel? user;
   late LocationModel? countryValue;
   late LocationModel? stateValue;
+  List<LocationModel> stateList = [];
   late PlaceViewModel placeViewModel;
   @override
   void initState() {
+    getValues();
     super.initState();
   }
 
-  void getValues() {
+  @override
+  void dispose() async {
+    super.dispose();
+  }
+
+  void getValues() async {
+    final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
     countryValue = placeViewModel.country;
     stateValue = placeViewModel.city;
+    stateList = placeViewModel.stateNameList;
+
     setState(() {
       isCountryReady = true;
       isStateReady = true;
@@ -43,7 +53,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void didChangeDependencies() {
     getUser();
     placeViewModel = Provider.of<PlaceViewModel>(context);
-    getValues();
     super.didChangeDependencies();
   }
 
@@ -52,14 +61,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     if (userViewModel.user != null) {
       user = await userViewModel.readUser(userViewModel.user!.userID);
     }
-
     isUserReady = true;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build tetiklendi');
     final userViewModel = Provider.of<UserViewModel>(context);
     return SafeArea(
       child: Drawer(
@@ -137,53 +144,66 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   hint: const Text('Ülke'),
                                   value: countryValue,
                                   items: placeViewModel.countryNameList
-                                      .map((LocationModel value) {
+                                      .map((LocationModel? value) {
                                     return DropdownMenuItem<LocationModel>(
                                       value: value,
-                                      child: Text(value.name),
+                                      child: Text(value!.name),
                                     );
                                   }).toList(),
-                                  onChanged: (model) async {
+                                  onChanged: (LocationModel? model) async {
                                     if (model != null) {
-                                      await placeViewModel.loadStates(model.id);
                                       isStateReady = false;
-                                      countryValue = model;
-                                      stateValue = placeViewModel
-                                              .stateNameList.isNotEmpty
-                                          ? placeViewModel.stateNameList.first
-                                          : null;
-                                      isStateReady = true;
+                                      stateList = await placeViewModel
+                                          .loadTempStates(model.id);
 
-                                      debugPrint('$stateValue**********');
+                                      countryValue = model;
+                                      stateValue = stateList.isNotEmpty
+                                          ? stateList.first
+                                          : null;
+
+                                      isStateReady = true;
                                     }
+                                    setState(() {});
                                   },
                                 )
                               : const Center(
                                   child: CircularProgressIndicator(),
                                 ),
                           isStateReady
-                              ? DropdownButtonFormField<LocationModel>(
-                                  isExpanded: true,
-                                  value: stateValue,
-                                  hint: const Text('Şehir'),
-                                  items: placeViewModel.stateNameList
-                                      .map((LocationModel value) {
-                                    debugPrint('$stateValue-------');
-                                    debugPrint(value.toString());
-                                    return DropdownMenuItem<LocationModel>(
-                                      value: value,
-                                      child: Text(value.name),
-                                    );
-                                  }).toList(),
-                                  onChanged: (model) {
-                                    stateValue = model;
-                                  },
-                                )
+                              ? Builder(builder: (context) {
+                                  // debugPrint(stateValue.toString());
+                                  // debugPrint(stateList.toString());
+                                  return DropdownButtonFormField<LocationModel>(
+                                    isExpanded: true,
+                                    value: stateValue,
+                                    hint: const Text('Şehir'),
+                                    items: stateList.map((LocationModel value) {
+                                      return DropdownMenuItem<LocationModel>(
+                                        value: value,
+                                        child: Text(value.name),
+                                      );
+                                    }).toList(),
+                                    onChanged: (model) {
+                                      stateValue = model;
+                                      setState(() {});
+                                    },
+                                  );
+                                })
                               : const Center(
                                   child: CircularProgressIndicator(),
                                 ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: (countryValue != null &&
+                                    stateValue != null)
+                                ? () {
+                                    placeViewModel.stateNameList = stateList;
+                                    placeViewModel.savePlace(
+                                        cityName: stateValue!,
+                                        countryName: countryValue!);
+                                    userViewModel.getSharingsbyLocation(
+                                        countryValue!.name, stateValue!.name);
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 shape: const StadiumBorder()),

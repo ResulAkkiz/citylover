@@ -36,7 +36,6 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build metodu çalıştı');
     final placeViewModel = Provider.of<PlaceViewModel>(context);
 
     return Scaffold(
@@ -68,6 +67,7 @@ class _FirstPageState extends State<FirstPage> {
                                   placeViewModel.stateNameList.isNotEmpty
                                       ? placeViewModel.stateNameList.first
                                       : null;
+
                               isStateReady = true;
                             }
                           },
