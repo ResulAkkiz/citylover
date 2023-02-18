@@ -1,9 +1,9 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/models/country_model.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
 import 'package:citylover/pages/authentication/signup_page.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
-import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,18 +15,28 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  String countryValue = "";
-  String stateValue = "";
-  String cityValue = "";
-  String address = "";
+  LocationModel? countryValue;
+  LocationModel? stateValue;
   bool isErrorVisible = false;
+  late PlaceViewModel placeViewModel;
+  bool isCountryReady = false;
+  bool isStateReady = false;
+
+  @override
+  void initState() {
+    getCountries();
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() {
+    placeViewModel = Provider.of<PlaceViewModel>(context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('build metodu çalıştı');
     final placeViewModel = Provider.of<PlaceViewModel>(context);
 
     return Scaffold(
@@ -38,81 +48,49 @@ class _FirstPageState extends State<FirstPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 36.0),
-                child: CSCPicker(
-                  layout: Layout.vertical,
-
-                  ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                  showStates: true,
-
-                  /// Enable disable city drop down [OPTIONAL PARAMETER]
-                  showCities: false,
-
-                  ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                  flagState: CountryFlag.SHOW_IN_DROP_DOWN_ONLY,
-
-                  ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                  dropdownDecoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xff000000),
-                      width: 1.3,
-                      style: BorderStyle.solid,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  ),
-
-                  ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                  disabledDropdownDecoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.shade300,
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 1)),
-
-                  countrySearchPlaceholder: "Ülke",
-                  stateSearchPlaceholder: "Şehir",
-                  citySearchPlaceholder: "İlçe",
-
-                  countryDropdownLabel: "*Ülke",
-                  stateDropdownLabel: "*Şehir",
-                  cityDropdownLabel: "*İlçe",
-
-                  ///Disable country dropdown (Note: use it with default country)
-                  //disableCountry: true,
-
-                  ///Country Filter [OPTIONAL PARAMETER]
-                  // countryFilter: const [
-                  //   CscCountry.India,
-                  //   CscCountry.United_States,
-                  //   CscCountry.Canada,
-                  //   CscCountry.Turkey,
-                  // ],
-
-                  ///selected item style [OPTIONAL PARAMETER]
-                  selectedItemStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  dropdownHeadingStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
-                  dropdownItemStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                  dropdownDialogRadius: 10.0,
-                  searchBarRadius: 10.0,
-                  onCountryChanged: (value) {
-                    setState(() {
-                      countryValue = value;
-                    });
-                  },
-                  onCityChanged: (value) {},
-                  onStateChanged: (value) {
-                    setState(() {
-                      stateValue = value ?? '';
-                    });
-                  },
-                ),
+                child: Column(children: [
+                  isCountryReady
+                      ? DropdownButtonFormField<LocationModel>(
+                          isExpanded: true,
+                          hint: const Text('Ülke'),
+                          items: placeViewModel.countryNameList
+                              .map((LocationModel value) {
+                            return DropdownMenuItem<LocationModel>(
+                              value: value,
+                              child: Text(value.name),
+                            );
+                          }).toList(),
+                          onChanged: (model) async {
+                            if (model != null) {
+                              await placeViewModel.loadStates(model.id);
+                              countryValue = model;
+                              stateValue =
+                                  placeViewModel.stateNameList.isNotEmpty
+                                      ? placeViewModel.stateNameList.first
+                                      : null;
+                              isStateReady = true;
+                            }
+                          },
+                        )
+                      : const Center(child: CircularProgressIndicator()),
+                  DropdownButtonFormField<LocationModel>(
+                    isExpanded: true,
+                    value: stateValue,
+                    hint: const Text('Şehir'),
+                    items:
+                        placeViewModel.stateNameList.map((LocationModel value) {
+                      return DropdownMenuItem<LocationModel>(
+                        value: value,
+                        child: Text(value.name),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      stateValue = value;
+                    },
+                  )
+                ]).separated(const SizedBox(
+                  height: 12.0,
+                )),
               ),
               Visibility(
                   visible: isErrorVisible,
@@ -125,12 +103,13 @@ class _FirstPageState extends State<FirstPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      debugPrint(countryValue + stateValue);
-                      if (countryValue == '' || stateValue == '') {
+                      if (countryValue == null || stateValue == null) {
                         setState(() {
                           isErrorVisible = true;
                         });
                       } else {
+                        placeViewModel.savePlace(
+                            cityName: stateValue!, countryName: countryValue!);
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const SignupPage()));
                         isErrorVisible = false;
@@ -143,10 +122,12 @@ class _FirstPageState extends State<FirstPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (countryValue == '' || stateValue == '') {
+                      if (countryValue == null || stateValue == null) {
                         setState(() {});
                         isErrorVisible = true;
                       } else {
+                        placeViewModel.savePlace(
+                            cityName: stateValue!, countryName: countryValue!);
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const LoginPage()));
                         isErrorVisible = false;
@@ -161,13 +142,13 @@ class _FirstPageState extends State<FirstPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    if (countryValue == '' || stateValue == '') {
+                    if (countryValue == null || stateValue == null) {
                       setState(() {
                         isErrorVisible = true;
                       });
                     } else {
                       placeViewModel.savePlace(
-                          cityName: stateValue, countryName: countryValue);
+                          cityName: stateValue!, countryName: countryValue!);
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => const HomePage()));
                       isErrorVisible = false;
@@ -187,26 +168,10 @@ class _FirstPageState extends State<FirstPage> {
       ),
     ));
   }
+
+  void getCountries() async {
+    final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
+    placeViewModel.loadCountries();
+    isCountryReady = true;
+  }
 }
-
-
- // fetchDataCountry().then((value) {
-    //   if (value["results"] is List) {
-    //     List<String> countryList = [];
-    //     for (Map<String, dynamic> element in value["results"]) {
-    //       countryList.add(element['name']);
-    //     }
-    //     debugPrint(countryList.length.toString());
-    //   }
-    // });
-
-    // fetchDataCities().then((value) {
-    //   if (value["results"] is List) {
-    //     List<String> countryList = [];
-    //     for (Map<String, dynamic> element in value["results"]) {
-    //       debugPrint(element['name']);
-    //       countryList.add(element['name']);
-    //     }
-    //     debugPrint(countryList.length.toString());
-    //   }
-    // });
