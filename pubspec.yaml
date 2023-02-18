@@ -45,6 +45,7 @@ dependencies:
   firebase_core: ^2.5.0
   csc_picker: ^0.2.7
   excel: ^2.0.1
+  flutter_excel: ^1.0.1
 
 dev_dependencies:
   flutter_test:

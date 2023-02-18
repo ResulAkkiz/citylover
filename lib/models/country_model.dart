@@ -10,22 +10,22 @@ class LocationModel {
   LocationModel({
     required this.id,
     required this.name,
-    required this.iso2,
   });
 
-  int id;
+  String id;
   String name;
-  String iso2;
 
   factory LocationModel.fromMap(Map<String, dynamic> json) => LocationModel(
         id: json["id"],
         name: json["name"],
-        iso2: json["iso2"],
       );
 
   Map<String, dynamic> toMap() => {
         "id": id,
         "name": name,
-        "iso2": iso2,
       };
+  @override
+  String toString() {
+    return '(id:$id, name:$name )';
+  }
 }

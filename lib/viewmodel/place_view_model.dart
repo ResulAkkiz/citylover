@@ -3,32 +3,34 @@ import 'package:citylover/service/country_service.dart';
 import 'package:flutter/material.dart';
 
 class PlaceViewModel extends ChangeNotifier {
-  String? _city;
-  String? _country;
+  LocationModel? _city;
+  LocationModel? _country;
 
-  String? get city => _city;
-  String? get country => _country;
+  LocationModel? get city => _city;
+  LocationModel? get country => _country;
 
   CountryService countryService = CountryService();
-  List<LocationModel> countryList = [];
-  List<LocationModel> stateList = [];
+  List<LocationModel> countryNameList = [];
+  List<LocationModel> stateNameList = [];
 
   void savePlace({
-    required String cityName,
-    required String countryName,
+    required LocationModel cityName,
+    required LocationModel countryName,
   }) {
     _city = cityName;
     _country = countryName;
     notifyListeners();
   }
 
-  Future<void> fetchDataCountry() async {
-    countryList = await countryService.fetchDataCountry();
+  Future<void> loadCountries() async {
+    countryNameList.clear();
+    countryNameList = await countryService.loadCountries();
     notifyListeners();
   }
 
-  Future<void> fetchDataState(String countryCode) async {
-    stateList = await countryService.fetchDataStates(countryCode);
+  Future<void> loadStates(String countryID) async {
+    stateNameList.clear();
+    stateNameList = await countryService.loadStates(countryID);
     notifyListeners();
   }
 }
