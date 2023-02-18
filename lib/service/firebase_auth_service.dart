@@ -1,3 +1,4 @@
+import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class FirebaseAuthService {
     String? surname,
     String? userGender,
     String? userProfilePict,
+    LocationModel? lastCountry,
+    LocationModel? lastState,
   }) async {
     try {
       UserCredential userCredential = await firebaseAuth
@@ -29,7 +32,8 @@ class FirebaseAuthService {
               userBirthdate: birthdate,
               userGender: userGender,
               userProfilePict: userProfilePict,
-            )
+              lastCountry: lastCountry,
+              lastState: lastState)
           : null;
     } on FirebaseAuthException catch (ex) {
       switch (ex.code) {

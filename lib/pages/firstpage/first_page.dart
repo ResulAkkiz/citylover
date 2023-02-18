@@ -122,16 +122,8 @@ class _FirstPageState extends State<FirstPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (countryValue == null || stateValue == null) {
-                        setState(() {});
-                        isErrorVisible = true;
-                      } else {
-                        placeViewModel.savePlace(
-                            cityName: stateValue!, countryName: countryValue!);
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginPage()));
-                        isErrorVisible = false;
-                      }
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

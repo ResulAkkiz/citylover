@@ -5,6 +5,7 @@ import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,19 +21,29 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isSharingListReady = false;
+  bool isUserReady = false;
+  UserModel? user;
+  late PlaceViewModel placeViewModel;
   List<SharingModel> sharingList = [];
   @override
+  void initState() {
+    getSharingsbyLocation();
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
-    getSharingsbyLocation(cityName: 'Ankara', countryName: 'Türkiye');
+    placeViewModel = Provider.of<PlaceViewModel>(context);
+
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('BUILDDD OLUYOM');
     final userViewModel = Provider.of<UserViewModel>(context);
     return WillPopScope(
       onWillPop: () async {
-        //kullanıcı uygulamadan çıkmak istediğinde uyarı ver
         return await showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -83,7 +94,8 @@ class _HomePageState extends State<HomePage> {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     itemBuilder: (context, index) {
-                      SharingModel currentSharing = sharingList[index];
+                      SharingModel currentSharing =
+                          userViewModel.sharingList[index];
                       return FutureBuilder<UserModel?>(
                           future: userViewModel.readUser(currentSharing.userID),
                           builder: (BuildContext context,
@@ -187,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                             }
                           });
                     },
-                    itemCount: sharingList.length,
+                    itemCount: userViewModel.sharingList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       return const Divider(thickness: 1.2);
                     },
@@ -201,12 +213,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> getSharingsbyLocation(
-      {required String countryName, required String cityName}) async {
-    final userViewModel = Provider.of<UserViewModel>(context);
-    sharingList =
-        await userViewModel.getSharingsbyLocation(countryName, cityName);
-    setState(() {});
+  Future<void> getSharingsbyLocation() async {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
+    if (userViewModel.user != null) {
+      user = await userViewModel.readUser(userViewModel.user!.userID);
+      isUserReady = true;
+      placeViewModel.savePlace(
+          cityName: user!.lastState!, countryName: user!.lastCountry!);
+      placeViewModel.loadStates(user!.lastCountry!.id);
+      setState(() {});
+    }
+
+    await userViewModel.getSharingsbyLocation(
+        placeViewModel.country!.name, placeViewModel.city!.name);
     isSharingListReady = true;
   }
 }

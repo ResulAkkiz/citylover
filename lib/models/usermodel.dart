@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:citylover/models/country_model.dart';
+
 class UserModel {
   String userID;
   String? userName;
@@ -7,6 +9,8 @@ class UserModel {
   DateTime? userBirthdate;
   String? userGender;
   String? userProfilePict;
+  LocationModel? lastState;
+  LocationModel? lastCountry;
   UserModel({
     required this.userID,
     this.userName,
@@ -15,6 +19,8 @@ class UserModel {
     this.userBirthdate,
     this.userGender,
     this.userProfilePict,
+    this.lastState,
+    this.lastCountry,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +32,8 @@ class UserModel {
       'userBirthdate': userBirthdate?.millisecondsSinceEpoch,
       'userGender': userGender,
       'userProfilePict': userProfilePict,
+      'lastState': lastState?.toMap(),
+      'lastCountry': lastCountry?.toMap(),
     };
   }
 
@@ -44,11 +52,17 @@ class UserModel {
       userProfilePict: map['userProfilePict'] != null
           ? map['userProfilePict'] as String
           : null,
+      lastCountry: map['lastCountry'] != null
+          ? LocationModel.fromMap(map['lastCountry'])
+          : null,
+      lastState: map['lastState'] != null
+          ? LocationModel.fromMap(map['lastState'])
+          : null,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel(userID: $userID, userName: $userName, userSurname: $userSurname, userEmail: $userEmail, userBirthdate: $userBirthdate, userGender: $userGender, userProfilePict: $userProfilePict)';
+    return 'UserModel(userID: $userID, userName: $userName, userSurname: $userSurname, userEmail: $userEmail, userBirthdate: $userBirthdate, userGender: $userGender, userProfilePict: $userProfilePict, lastState: $lastState, lastCountry: $lastCountry)';
   }
 }

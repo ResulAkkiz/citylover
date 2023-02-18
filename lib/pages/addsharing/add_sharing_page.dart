@@ -3,6 +3,7 @@ import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class _AddSharingPageState extends State<AddSharingPage> {
   @override
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
+    final placeViewModel = Provider.of<PlaceViewModel>(context);
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
@@ -124,8 +126,8 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                     await userViewModel.addSharing(SharingModel(
                                   sharingID: getRandomString(12),
                                   userID: user!.userID,
-                                  countryName: 'Türkiye',
-                                  cityName: 'Ankara',
+                                  countryName: placeViewModel.country!.name,
+                                  cityName: placeViewModel.city!.name,
                                   sharingContent: sharingController.text,
                                   sharingDate: DateTime.now(),
                                 ));

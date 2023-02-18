@@ -42,6 +42,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     countryValue = placeViewModel.country;
     stateValue = placeViewModel.city;
     stateList = placeViewModel.stateNameList;
+    debugPrint(placeViewModel.stateNameList.length.toString());
 
     setState(() {
       isCountryReady = true;
@@ -144,10 +145,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   hint: const Text('Ülke'),
                                   value: countryValue,
                                   items: placeViewModel.countryNameList
-                                      .map((LocationModel? value) {
+                                      .map((LocationModel value) {
                                     return DropdownMenuItem<LocationModel>(
                                       value: value,
-                                      child: Text(value!.name),
+                                      child: Text(value.name),
                                     );
                                   }).toList(),
                                   onChanged: (LocationModel? model) async {
@@ -155,7 +156,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                       isStateReady = false;
                                       stateList = await placeViewModel
                                           .loadTempStates(model.id);
-
                                       countryValue = model;
                                       stateValue = stateList.isNotEmpty
                                           ? stateList.first
@@ -170,25 +170,21 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   child: CircularProgressIndicator(),
                                 ),
                           isStateReady
-                              ? Builder(builder: (context) {
-                                  // debugPrint(stateValue.toString());
-                                  // debugPrint(stateList.toString());
-                                  return DropdownButtonFormField<LocationModel>(
-                                    isExpanded: true,
-                                    value: stateValue,
-                                    hint: const Text('Şehir'),
-                                    items: stateList.map((LocationModel value) {
-                                      return DropdownMenuItem<LocationModel>(
-                                        value: value,
-                                        child: Text(value.name),
-                                      );
-                                    }).toList(),
-                                    onChanged: (model) {
-                                      stateValue = model;
-                                      setState(() {});
-                                    },
-                                  );
-                                })
+                              ? DropdownButtonFormField<LocationModel>(
+                                  isExpanded: true,
+                                  value: stateValue,
+                                  hint: const Text('Şehir'),
+                                  items: stateList.map((LocationModel value) {
+                                    return DropdownMenuItem<LocationModel>(
+                                      value: value,
+                                      child: Text(value.name),
+                                    );
+                                  }).toList(),
+                                  onChanged: (model) {
+                                    stateValue = model;
+                                    setState(() {});
+                                  },
+                                )
                               : const Center(
                                   child: CircularProgressIndicator(),
                                 ),
@@ -202,6 +198,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                         countryName: countryValue!);
                                     userViewModel.getSharingsbyLocation(
                                         countryValue!.name, stateValue!.name);
+                                    userViewModel.updateUser(
+                                        userViewModel.user!.userID, {
+                                      'lastState': stateValue?.toMap(),
+                                      'lastCountry': countryValue?.toMap(),
+                                    });
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
