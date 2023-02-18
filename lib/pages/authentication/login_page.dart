@@ -1,5 +1,6 @@
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
+import 'package:citylover/pages/resetPassword/reset_password_page.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -49,33 +50,51 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: const InputDecoration(
                               hintText: 'E-mail', labelText: 'E-mail'),
                         ),
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: obscurePassword,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return "Lütfen şifrenizi giriniz.";
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Şifre',
-                            labelText: 'Şifre',
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                if (mounted) {
-                                  setState(() {
-                                    obscurePassword = !obscurePassword;
-                                  });
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextFormField(
+                              controller: passwordController,
+                              obscureText: obscurePassword,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "Lütfen şifrenizi giriniz.";
                                 }
+                                return null;
                               },
-                              child: Icon(
-                                  obscurePassword
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: Colors.black),
+                              decoration: InputDecoration(
+                                hintText: 'Şifre',
+                                labelText: 'Şifre',
+                                suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    if (mounted) {
+                                      setState(() {
+                                        obscurePassword = !obscurePassword;
+                                      });
+                                    }
+                                  },
+                                  child: Icon(
+                                      obscurePassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.black),
+                                ),
+                              ),
                             ),
-                          ),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ResetPasswordPage(),
+                                  ));
+                                },
+                                child: const Text(
+                                  'Şifremi unuttum...',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      decoration: TextDecoration.underline),
+                                ))
+                          ],
                         ),
                         ElevatedButton(
                           onPressed: () async {

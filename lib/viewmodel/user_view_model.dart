@@ -115,4 +115,8 @@ class UserViewModel extends ChangeNotifier {
   Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
     return firebaseDbService.updateUser(userId, newMap);
   }
+
+  Future<bool> resetPassword(String email) async {
+    return firebaseAuthService.resetPassword(email);
+  }
 }

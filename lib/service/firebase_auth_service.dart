@@ -112,17 +112,23 @@ class FirebaseAuthService {
     }
   }
 
-  Future<bool?> updatePassword(String email) {
-    throw UnimplementedError();
+  Future<bool?> updatePassword(String newPassword) async {
+    try {
+      await FirebaseAuth.instance.currentUser?.updatePassword(newPassword);
+      return true;
+    } catch (e) {
+      debugPrint("Forget Password Hatası: ${e.toString()}");
+      return false;
+    }
   }
 
-  Future<bool?> resetPassword(String email) async {
+  Future<bool> resetPassword(String email) async {
     try {
       await firebaseAuth.sendPasswordResetEmail(email: email);
       return true;
     } catch (e) {
       debugPrint("resetPassword error: ${e.toString()}");
-      return null;
+      return false;
     }
   }
 }
