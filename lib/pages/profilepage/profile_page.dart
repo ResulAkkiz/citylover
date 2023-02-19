@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
-import 'package:citylover/common_widgets/datetime_picker_widget.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/pages/updateEmail/update_email_page.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -253,6 +253,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                       shape: const StadiumBorder()),
                                   child: const Text('Profili Güncelle'),
                                 ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
+                                      shape: const StadiumBorder()),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UpdateEmailPage(),
+                                    ));
+                                  },
+                                  child: const Text('E-Mail Güncelle'),
+                                )
                               ],
                             ),
                           ],
@@ -268,6 +282,26 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: CircularProgressIndicator(),
               ),
       ),
+    );
+  }
+
+  Widget buildDateTimePicker({
+    required IconData iconData,
+    required BuildContext context,
+    required void Function(DateTime) onSelected,
+    required TextEditingController controller,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      readOnly: true,
+      controller: controller,
+      decoration: InputDecoration(
+          prefixIcon: Icon(
+            iconData,
+            color: Colors.black,
+          ),
+          hintText: controller.text == '' ? 'Doğum Tarihi' : controller.text,
+          contentPadding: const EdgeInsets.fromLTRB(74, 12, 10, 12)),
     );
   }
 

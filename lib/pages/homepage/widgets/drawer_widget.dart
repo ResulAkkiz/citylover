@@ -4,6 +4,7 @@ import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
 import 'package:citylover/pages/authentication/signup_page.dart';
+import 'package:citylover/pages/landingpage/landing_page.dart';
 import 'package:citylover/pages/profilepage/profile_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
@@ -24,15 +25,26 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   UserModel? user;
   late LocationModel? countryValue;
   late LocationModel? stateValue;
+  List<LocationModel> stateList = [];
   late PlaceViewModel placeViewModel;
   @override
   void initState() {
+    getValues();
     super.initState();
   }
 
-  void getValues() {
+  @override
+  void dispose() async {
+    super.dispose();
+  }
+
+  void getValues() async {
+    final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
     countryValue = placeViewModel.country;
     stateValue = placeViewModel.city;
+    stateList = placeViewModel.stateNameList;
+    debugPrint(placeViewModel.stateNameList.length.toString());
+
     setState(() {
       isCountryReady = true;
       isStateReady = true;
@@ -43,7 +55,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void didChangeDependencies() {
     getUser();
     placeViewModel = Provider.of<PlaceViewModel>(context);
-    getValues();
     super.didChangeDependencies();
   }
 
@@ -52,14 +63,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     if (userViewModel.user != null) {
       user = await userViewModel.readUser(userViewModel.user!.userID);
     }
-
     isUserReady = true;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build tetiklendi');
     final userViewModel = Provider.of<UserViewModel>(context);
     return SafeArea(
       child: Drawer(
@@ -143,19 +152,19 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                       child: Text(value.name),
                                     );
                                   }).toList(),
-                                  onChanged: (model) async {
+                                  onChanged: (LocationModel? model) async {
                                     if (model != null) {
-                                      await placeViewModel.loadStates(model.id);
                                       isStateReady = false;
+                                      stateList = await placeViewModel
+                                          .loadTempStates(model.id);
                                       countryValue = model;
-                                      stateValue = placeViewModel
-                                              .stateNameList.isNotEmpty
-                                          ? placeViewModel.stateNameList.first
+                                      stateValue = stateList.isNotEmpty
+                                          ? stateList.first
                                           : null;
-                                      isStateReady = true;
 
-                                      debugPrint('$stateValue**********');
+                                      isStateReady = true;
                                     }
+                                    setState(() {});
                                   },
                                 )
                               : const Center(
@@ -166,10 +175,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   isExpanded: true,
                                   value: stateValue,
                                   hint: const Text('Şehir'),
-                                  items: placeViewModel.stateNameList
-                                      .map((LocationModel value) {
-                                    debugPrint('$stateValue-------');
-                                    debugPrint(value.toString());
+                                  items: stateList.map((LocationModel value) {
                                     return DropdownMenuItem<LocationModel>(
                                       value: value,
                                       child: Text(value.name),
@@ -177,13 +183,31 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   }).toList(),
                                   onChanged: (model) {
                                     stateValue = model;
+                                    setState(() {});
                                   },
                                 )
                               : const Center(
                                   child: CircularProgressIndicator(),
                                 ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: (countryValue != null &&
+                                    stateValue != null)
+                                ? () {
+                                    placeViewModel.stateNameList = stateList;
+                                    placeViewModel.savePlace(
+                                        cityName: stateValue!,
+                                        countryName: countryValue!);
+                                    userViewModel.getSharingsbyLocation(
+                                        countryValue!.name, stateValue!.name);
+                                    if (userViewModel.user != null) {
+                                      userViewModel.updateUser(
+                                          userViewModel.user!.userID, {
+                                        'lastState': stateValue?.toMap(),
+                                        'lastCountry': countryValue?.toMap(),
+                                      });
+                                    }
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 shape: const StadiumBorder()),
@@ -224,6 +248,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               ListTile(
                                   onTap: () {
                                     userViewModel.signOut();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LandingScreen()),
+                                        (Route<dynamic> route) => false);
                                   },
                                   iconColor: Colors.black,
                                   tileColor: Theme.of(context).primaryColor,

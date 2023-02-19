@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/common_widgets/datetime_picker_widget.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,6 +43,8 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
+    final placeViewModel = Provider.of<PlaceViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -260,6 +263,8 @@ class _SignupPageState extends State<SignupPage> {
                                         name: nameController.text,
                                         surname: surnameController.text,
                                         userGender: choose.toString(),
+                                        lastCountry: placeViewModel.country,
+                                        lastState: placeViewModel.city,
                                         userProfilePict:
                                             await userViewModel.uploadFile(
                                                 getRandomString(12),

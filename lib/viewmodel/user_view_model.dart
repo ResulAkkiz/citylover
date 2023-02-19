@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:citylover/models/commentmodel.dart';
+import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
@@ -23,6 +24,7 @@ class UserViewModel extends ChangeNotifier {
     currentUser();
   }
   List<CommentModel> commentList = [];
+  List<SharingModel> sharingList = [];
 
   Future<UserModel?> createEmailPassword({
     required String email,
@@ -32,6 +34,8 @@ class UserViewModel extends ChangeNotifier {
     DateTime? birthdate,
     String? userGender,
     String? userProfilePict,
+    LocationModel? lastCountry,
+    LocationModel? lastState,
   }) async {
     _user = await firebaseAuthService.createEmailPassword(
       email: email,
@@ -41,6 +45,8 @@ class UserViewModel extends ChangeNotifier {
       surname: surname,
       userGender: userGender,
       userProfilePict: userProfilePict,
+      lastCountry: lastCountry,
+      lastState: lastState,
     );
     notifyListeners();
     if (_user != null) {
@@ -83,9 +89,12 @@ class UserViewModel extends ChangeNotifier {
     return firebaseStorageService.uploadFile(userID, fileType, uploadedFile);
   }
 
-  Future<List<SharingModel>> getSharingsbyLocation(
-      String countryName, String cityName) async {
-    return firebaseDbService.getSharingsbyLocation(countryName, cityName);
+  Future<void> getSharingsbyLocation(
+      String countryValue, String cityValue) async {
+    sharingList =
+        await firebaseDbService.getSharingsbyLocation(countryValue, cityValue);
+    debugPrint(sharingList.length.toString());
+    notifyListeners();
   }
 
   Future<bool> addComment(CommentModel commentModel) async {
@@ -105,5 +114,13 @@ class UserViewModel extends ChangeNotifier {
 
   Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
     return firebaseDbService.updateUser(userId, newMap);
+  }
+
+  Future<bool> resetPassword(String email) async {
+    return await firebaseAuthService.resetPassword(email);
+  }
+
+  Future<bool> updateEmail(String newEmail, String password) async {
+    return await firebaseAuthService.updateEmail(newEmail, password);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class FirebaseAuthService {
     String? surname,
     String? userGender,
     String? userProfilePict,
+    LocationModel? lastCountry,
+    LocationModel? lastState,
   }) async {
     try {
       UserCredential userCredential = await firebaseAuth
@@ -29,7 +32,8 @@ class FirebaseAuthService {
               userBirthdate: birthdate,
               userGender: userGender,
               userProfilePict: userProfilePict,
-            )
+              lastCountry: lastCountry,
+              lastState: lastState)
           : null;
     } on FirebaseAuthException catch (ex) {
       switch (ex.code) {
@@ -101,6 +105,7 @@ class FirebaseAuthService {
   Future<bool?> signOut() async {
     try {
       await firebaseAuth.signOut();
+
       return true;
     } catch (e) {
       debugPrint("Singout Hatası: ${e.toString()}");
@@ -108,17 +113,38 @@ class FirebaseAuthService {
     }
   }
 
-  Future<bool?> updatePassword(String email) {
-    throw UnimplementedError();
+  Future<bool?> updatePassword(String newPassword) async {
+    try {
+      await FirebaseAuth.instance.currentUser?.updatePassword(newPassword);
+      return true;
+    } catch (e) {
+      debugPrint("Forget Password Hatası: ${e.toString()}");
+      return false;
+    }
   }
 
-  Future<bool?> resetPassword(String email) async {
+  Future<bool> updateEmail(String newEmail, String password) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      final credential =
+          EmailAuthProvider.credential(email: user!.email!, password: password);
+      await user.reauthenticateWithCredential(credential);
+      await user.updateEmail(newEmail);
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      debugPrint("Update Email Hatası: ${e.toString()}");
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(String email) async {
     try {
       await firebaseAuth.sendPasswordResetEmail(email: email);
       return true;
     } catch (e) {
       debugPrint("resetPassword error: ${e.toString()}");
-      return null;
+      return false;
     }
   }
 }

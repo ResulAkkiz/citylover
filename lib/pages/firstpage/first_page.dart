@@ -36,7 +36,6 @@ class _FirstPageState extends State<FirstPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build metodu çalıştı');
     final placeViewModel = Provider.of<PlaceViewModel>(context);
 
     return Scaffold(
@@ -68,6 +67,7 @@ class _FirstPageState extends State<FirstPage> {
                                   placeViewModel.stateNameList.isNotEmpty
                                       ? placeViewModel.stateNameList.first
                                       : null;
+
                               isStateReady = true;
                             }
                           },
@@ -122,16 +122,8 @@ class _FirstPageState extends State<FirstPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (countryValue == null || stateValue == null) {
-                        setState(() {});
-                        isErrorVisible = true;
-                      } else {
-                        placeViewModel.savePlace(
-                            cityName: stateValue!, countryName: countryValue!);
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LoginPage()));
-                        isErrorVisible = false;
-                      }
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
