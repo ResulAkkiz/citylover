@@ -105,6 +105,7 @@ class FirebaseAuthService {
   Future<bool?> signOut() async {
     try {
       await firebaseAuth.signOut();
+
       return true;
     } catch (e) {
       debugPrint("Singout Hatası: ${e.toString()}");
@@ -118,6 +119,21 @@ class FirebaseAuthService {
       return true;
     } catch (e) {
       debugPrint("Forget Password Hatası: ${e.toString()}");
+      return false;
+    }
+  }
+
+  Future<bool> updateEmail(String newEmail, String password) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      final credential =
+          EmailAuthProvider.credential(email: user!.email!, password: password);
+      await user.reauthenticateWithCredential(credential);
+      await user.updateEmail(newEmail);
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      debugPrint("Update Email Hatası: ${e.toString()}");
       return false;
     }
   }

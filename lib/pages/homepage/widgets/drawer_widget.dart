@@ -4,6 +4,7 @@ import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/authentication/login_page.dart';
 import 'package:citylover/pages/authentication/signup_page.dart';
+import 'package:citylover/pages/landingpage/landing_page.dart';
 import 'package:citylover/pages/profilepage/profile_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
@@ -198,11 +199,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                         countryName: countryValue!);
                                     userViewModel.getSharingsbyLocation(
                                         countryValue!.name, stateValue!.name);
-                                    userViewModel.updateUser(
-                                        userViewModel.user!.userID, {
-                                      'lastState': stateValue?.toMap(),
-                                      'lastCountry': countryValue?.toMap(),
-                                    });
+                                    if (userViewModel.user != null) {
+                                      userViewModel.updateUser(
+                                          userViewModel.user!.userID, {
+                                        'lastState': stateValue?.toMap(),
+                                        'lastCountry': countryValue?.toMap(),
+                                      });
+                                    }
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
@@ -245,6 +248,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               ListTile(
                                   onTap: () {
                                     userViewModel.signOut();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LandingScreen()),
+                                        (Route<dynamic> route) => false);
                                   },
                                   iconColor: Colors.black,
                                   tileColor: Theme.of(context).primaryColor,

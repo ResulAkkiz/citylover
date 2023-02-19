@@ -4,6 +4,7 @@ import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
+import 'package:citylover/pages/profilepage/other_profile_page.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     placeViewModel = Provider.of<PlaceViewModel>(context);
-
     super.didChangeDependencies();
   }
 
@@ -110,9 +110,19 @@ class _HomePageState extends State<HomePage> {
                                         sharingModel: currentSharing),
                                   ));
                                 },
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      currentUser!.userProfilePict!),
+                                leading: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          OtherUserProfilePage(
+                                              userID: currentUser.userID),
+                                    ));
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                        currentUser!.userProfilePict!),
+                                  ),
                                 ),
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

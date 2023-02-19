@@ -19,8 +19,8 @@ class AddSharingPage extends StatefulWidget {
 
 class _AddSharingPageState extends State<AddSharingPage> {
   UserModel? user;
-  String country = 'Türkiye';
-  String city = 'Ankara';
+  String? country;
+  String? city;
 
   bool isUserReady = false;
   @override
@@ -30,6 +30,9 @@ class _AddSharingPageState extends State<AddSharingPage> {
 
   @override
   void didChangeDependencies() {
+    final placeViewModel = Provider.of<PlaceViewModel>(context);
+    country = placeViewModel.country!.name;
+    city = placeViewModel.city!.name;
     getUser();
     super.didChangeDependencies();
   }
@@ -37,6 +40,7 @@ class _AddSharingPageState extends State<AddSharingPage> {
   TextEditingController sharingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    debugPrint('buildooo');
     final userViewModel = Provider.of<UserViewModel>(context);
     final placeViewModel = Provider.of<PlaceViewModel>(context);
     return WillPopScope(
