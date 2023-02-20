@@ -292,41 +292,51 @@ class _ProfilePageState extends State<ProfilePage> {
                             itemBuilder: (context, index) {
                               SharingModel currentSharing = sharingList[index];
                               return ListTile(
-                                onTap: () {},
-                                leading: CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(user!.userProfilePict!),
-                                ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currentSharing.sharingContent,
-                                      style: const TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                  onTap: () {},
+                                  leading: CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(user!.userProfilePict!),
+                                  ),
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          DateFormat('HH:mm•dd/MM/yyyy').format(
-                                              currentSharing.sharingDate),
-                                          // '11:12 • 11/02/2023',
+                                          '${currentSharing.countryName} / ${currentSharing.cityName}', //'$country / $province',
                                           style: const TextStyle(
-                                            fontSize: 10,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        Text(
+                                          currentSharing.sharingContent,
+                                          style: const TextStyle(
                                             color: Colors.black54,
+                                            fontSize: 12,
                                           ),
                                         ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              DateFormat('HH:mm•dd/MM/yyyy')
+                                                  .format(currentSharing
+                                                      .sharingDate),
+                                              // '11:12 • 11/02/2023',
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ],
+                                        )
                                       ],
-                                    )
-                                  ],
-                                ).separated(const SizedBox(
-                                  height: 8,
-                                )),
-                              );
+                                    ).separated(const SizedBox(
+                                      height: 8,
+                                    )),
+                                  ));
                             },
                             separatorBuilder: (context, index) {
                               return const Divider(

@@ -5,6 +5,7 @@ import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
+import 'package:citylover/pages/profilepage/other_profile_page.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -60,34 +61,42 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundImage: NetworkImage(userModel.userProfilePict!),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${userModel.userName} ${userModel.userSurname}',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      '${sharingModel.countryName} / ${sharingModel.cityName}', //'$country / $province',
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black.withOpacity(0.6)),
-                    ),
-                  ],
-                ),
-              ],
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      OtherUserProfilePage(userID: userModel.userID),
+                ));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundImage: NetworkImage(userModel.userProfilePict!),
+                  ),
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${userModel.userName} ${userModel.userSurname}',
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        '${sharingModel.countryName} / ${sharingModel.cityName}', //'$country / $province',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black.withOpacity(0.6)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             Text(
               sharingModel.sharingContent,
@@ -151,7 +160,6 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                               return const CircularProgressIndicator();
                             }
                           });
-
                     },
                     itemCount: userViewModel.commentList.length,
                     separatorBuilder: (BuildContext context, int index) {
