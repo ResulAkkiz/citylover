@@ -40,7 +40,6 @@ class _AddSharingPageState extends State<AddSharingPage> {
   TextEditingController sharingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    debugPrint('buildooo');
     final userViewModel = Provider.of<UserViewModel>(context);
     final placeViewModel = Provider.of<PlaceViewModel>(context);
     return WillPopScope(

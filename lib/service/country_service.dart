@@ -20,7 +20,6 @@ class CountryService {
     List<LocationModel> result = [];
     if (response.statusCode == 200) {
       result = locationsFromMap(await response.stream.bytesToString());
-      debugPrint(result.length.toString());
     } else {
       print(response.reasonPhrase);
     }
@@ -44,7 +43,6 @@ class CountryService {
     List<LocationModel> result = [];
     if (response.statusCode == 200) {
       result = locationsFromMap(await response.stream.bytesToString());
-      debugPrint(result.length.toString());
     } else {
       print(response.reasonPhrase);
     }

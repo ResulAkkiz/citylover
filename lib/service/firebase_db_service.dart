@@ -48,6 +48,11 @@ class FirebaseDbService {
         .collection(sharingModel.cityName)
         .doc(sharingModel.sharingID)
         .set(sharingMap);
+    await firestore
+        .collection('sharingsbyuser')
+        .doc(sharingModel.userID)
+        .set({sharingModel.sharingID: sharingMap}, SetOptions(merge: true));
+
     return true;
   }
 
@@ -65,6 +70,21 @@ class FirebaseDbService {
       sharingList.add(SharingModel.fromMap(singleSharing));
     }
     sharingList.sort((b, a) => a.sharingDate.compareTo(b.sharingDate));
+    return sharingList;
+  }
+
+  Future<List<SharingModel>> getSharingsbyID(String userID) async {
+    DocumentSnapshot<Map<String, dynamic>> querySnapshot =
+        await firestore.collection('sharingsbyuser').doc(userID).get();
+    Map<String, dynamic>? sharingMap = querySnapshot.data();
+    List<SharingModel> sharingList = [];
+
+    if (sharingMap != null) {
+      for (Map<String, dynamic> element in sharingMap.values) {
+        sharingList.add(SharingModel.fromMap(element));
+      }
+    }
+
     return sharingList;
   }
 

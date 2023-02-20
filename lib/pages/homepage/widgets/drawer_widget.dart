@@ -2,8 +2,6 @@ import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_clipper.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
-import 'package:citylover/pages/authentication/login_page.dart';
-import 'package:citylover/pages/authentication/signup_page.dart';
 import 'package:citylover/pages/landingpage/landing_page.dart';
 import 'package:citylover/pages/profilepage/profile_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
@@ -43,7 +41,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     countryValue = placeViewModel.country;
     stateValue = placeViewModel.city;
     stateList = placeViewModel.stateNameList;
-    debugPrint(placeViewModel.stateNameList.length.toString());
 
     setState(() {
       isCountryReady = true;
@@ -274,10 +271,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                    Navigator.of(context)
-                                        .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => const SignupPage(),
-                                    ));
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LandingScreen()),
+                                        (Route<dynamic> route) => false);
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:
@@ -287,10 +285,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
-                                    Navigator.of(context)
-                                        .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => const LoginPage(),
-                                    ));
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LandingScreen()),
+                                        (Route<dynamic> route) => false);
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor:

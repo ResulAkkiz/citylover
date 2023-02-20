@@ -10,12 +10,10 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     UserViewModel userViewModel = Provider.of<UserViewModel>(context);
-    debugPrint((userViewModel.user.toString()).toString());
+
     if (userViewModel.user == null) {
-      debugPrint('FirstPage');
       return const FirstPage();
     } else {
-      debugPrint('HomePage');
       return const HomePage();
     }
   }

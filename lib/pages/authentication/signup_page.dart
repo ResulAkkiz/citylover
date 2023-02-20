@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../landingpage/landing_page.dart';
+
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -256,6 +258,20 @@ class _SignupPageState extends State<SignupPage> {
                                 if (userPhoto != null) {
                                   formKey.currentState!.save();
                                   if (formKey.currentState!.validate()) {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.2,
+                                            child: const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ));
+                                      },
+                                    );
                                     userViewModel.createEmailPassword(
                                         email: emailController.text,
                                         password: passwordController.text,
@@ -270,6 +286,13 @@ class _SignupPageState extends State<SignupPage> {
                                                 getRandomString(12),
                                                 'profilephoto',
                                                 userPhoto!));
+                                    if (mounted) {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LandingScreen()),
+                                          (Route<dynamic> route) => false);
+                                    }
                                   }
                                   isErrorVisible = false;
                                 } else {
