@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('BUILDDD OLUYOM');
     final userViewModel = Provider.of<UserViewModel>(context);
     return WillPopScope(
       onWillPop: () async {
@@ -237,6 +236,7 @@ class _HomePageState extends State<HomePage> {
 
     await userViewModel.getSharingsbyLocation(
         placeViewModel.country!.name, placeViewModel.city!.name);
+
     isSharingListReady = true;
   }
 }

@@ -1,8 +1,10 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
@@ -17,6 +19,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
   TextEditingController surnameController = TextEditingController();
   bool isUserReady = false;
   UserModel? user;
+  List<SharingModel> sharingList = [];
 
   @override
   void initState() {
@@ -26,7 +29,6 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context);
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
@@ -81,10 +83,70 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                                 hintText: 'Soyisim', labelText: 'Soyisim'),
                           ),
                         ],
-                      ).separated(const SizedBox(
-                        height: 16,
-                      )),
+                      ).separated(
+                        const SizedBox(
+                          height: 16,
+                        ),
+                      ),
                     ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: ListView.separated(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            SharingModel currentSharing = sharingList[index];
+                            return ListTile(
+                              onTap: () {},
+                              leading: CircleAvatar(
+                                backgroundImage:
+                                    NetworkImage(user!.userProfilePict!),
+                              ),
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    currentSharing.sharingContent,
+                                    style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        DateFormat('HH:mm•dd/MM/yyyy')
+                                            .format(currentSharing.sharingDate),
+                                        // '11:12 • 11/02/2023',
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ).separated(const SizedBox(
+                                height: 8,
+                              )),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const Divider(
+                              thickness: 1.2,
+                              color: Colors.white,
+                            );
+                          },
+                          itemCount: sharingList.length),
+                    )
                   ],
                 ),
               )
@@ -98,9 +160,11 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
   void getStarted(String userID) async {
     UserViewModel userViewModel =
         Provider.of<UserViewModel>(context, listen: false);
+
     user = await userViewModel.readUser(userID);
     nameController.text = user!.userName ?? '';
     surnameController.text = user!.userSurname ?? '';
+    sharingList = await userViewModel.getSharingsbyID(userID);
     isUserReady = true;
     setState(() {});
   }

@@ -77,6 +77,10 @@ class UserViewModel extends ChangeNotifier {
     return await firebaseDbService.saveUser(user);
   }
 
+  Future<List<SharingModel>> getSharingsbyID(String userID) async {
+    return await firebaseDbService.getSharingsbyID(userID);
+  }
+
   Future<UserModel?> readUser(String userId) async {
     return await firebaseDbService.readUser(userId);
   }

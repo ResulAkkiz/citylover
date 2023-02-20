@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
+import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/pages/updateEmail/update_email_page.dart';
@@ -31,6 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
   File? userPhoto;
   int choose = 0;
   UserModel? user;
+  List<SharingModel> sharingList = [];
   Map<String, IconData> genderMap = {
     'Erkek': Icons.male,
     'Kadın': Icons.female,
@@ -270,9 +272,69 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ],
-                        ).separated(const SizedBox(
-                          height: 16,
-                        )),
+                        ).separated(
+                          const SizedBox(
+                            height: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        child: ListView.separated(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              SharingModel currentSharing = sharingList[index];
+                              return ListTile(
+                                onTap: () {},
+                                leading: CircleAvatar(
+                                  backgroundImage:
+                                      NetworkImage(user!.userProfilePict!),
+                                ),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      currentSharing.sharingContent,
+                                      style: const TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          DateFormat('HH:mm•dd/MM/yyyy').format(
+                                              currentSharing.sharingDate),
+                                          // '11:12 • 11/02/2023',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ).separated(const SizedBox(
+                                  height: 8,
+                                )),
+                              );
+                            },
+                            separatorBuilder: (context, index) {
+                              return const Divider(
+                                thickness: 1.2,
+                                color: Colors.white,
+                              );
+                            },
+                            itemCount: sharingList.length),
                       ),
                     ],
                   ),
@@ -329,6 +391,9 @@ class _ProfilePageState extends State<ProfilePage> {
           .format(user?.userBirthdate ?? DateTime.now());
 
       choose = int.parse(user!.userGender ?? '0');
+      sharingList =
+          await userViewModel.getSharingsbyID(userViewModel.user!.userID);
+      debugPrint(sharingList.toString());
     }
     isUserReady = true;
     setState(() {});
