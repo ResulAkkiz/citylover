@@ -112,6 +112,12 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
+                                    '${currentSharing.countryName} / ${currentSharing.cityName}', //'$country / $province',
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
                                     currentSharing.sharingContent,
                                     style: const TextStyle(
                                       color: Colors.black54,

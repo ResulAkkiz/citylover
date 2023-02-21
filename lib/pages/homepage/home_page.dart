@@ -1,4 +1,5 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
@@ -85,6 +86,16 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          centerTitle: true,
+          title: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(
+              '${placeViewModel.country?.name} / ${placeViewModel.city?.name}',
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black.withOpacity(0.6)),
+            ),
+          ),
         ),
         drawer: const DrawerWidget(),
         body: isSharingListReady
@@ -188,7 +199,80 @@ class _HomePageState extends State<HomePage> {
                                                           CircularProgressIndicator(),
                                                     );
                                                   }
-                                                })
+                                                }),
+                                            Builder(
+                                              builder: (context) {
+                                                if (userViewModel.user !=
+                                                    null) {
+                                                  if (currentSharing.userID !=
+                                                      userViewModel
+                                                          .user!.userID) {
+                                                    return IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      onPressed: () async {
+                                                        bool response =
+                                                            await buildShowDialog(
+                                                                    context,
+                                                                    const Text(
+                                                                        'Uyarı'),
+                                                                    const Text(
+                                                                        'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
+                                                                false;
+
+                                                        if (response) {
+                                                          //TODO: Yorum raporlama işlemleri
+                                                          debugPrint(
+                                                              'Yorum raporlama işlemleri');
+                                                        }
+                                                      },
+                                                      constraints:
+                                                          const BoxConstraints(),
+                                                      icon: const Icon(
+                                                        Icons
+                                                            .report_problem_outlined,
+                                                        size: 14,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      onPressed: () async {
+                                                        bool response =
+                                                            await buildShowDialog(
+                                                                    context,
+                                                                    const Text(
+                                                                        'Uyarı'),
+                                                                    const Text(
+                                                                        'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
+                                                                false;
+
+                                                        if (response) {
+                                                          bool isSuccesful =
+                                                              await userViewModel
+                                                                  .deleteSharing(
+                                                                      currentSharing);
+                                                          if (isSuccesful &&
+                                                              mounted) {
+                                                            buildShowModelBottomSheet(
+                                                                context,
+                                                                'Paylaşım silme işlemi başarıyla gerçekleşti.',
+                                                                Icons.check);
+                                                          }
+                                                        }
+                                                      },
+                                                      constraints:
+                                                          const BoxConstraints(),
+                                                      icon: const Icon(
+                                                        Icons.clear,
+                                                        size: 14,
+                                                      ),
+                                                    );
+                                                  }
+                                                } else {
+                                                  return const SizedBox();
+                                                }
+                                              },
+                                            )
                                           ],
                                         ),
                                       ],

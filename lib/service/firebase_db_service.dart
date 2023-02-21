@@ -35,27 +35,6 @@ class FirebaseDbService {
     return true;
   }
 
-  Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
-    firestore.collection('users').doc(userId).update(newMap);
-    return true;
-  }
-
-  Future<bool> addSharing(SharingModel sharingModel) async {
-    Map<String, dynamic> sharingMap = sharingModel.toMap();
-    await firestore
-        .collection('sharings')
-        .doc(sharingModel.countryName)
-        .collection(sharingModel.cityName)
-        .doc(sharingModel.sharingID)
-        .set(sharingMap);
-    await firestore
-        .collection('sharingsbyuser')
-        .doc(sharingModel.userID)
-        .set({sharingModel.sharingID: sharingMap}, SetOptions(merge: true));
-
-    return true;
-  }
-
   Future<List<SharingModel>> getSharingsbyLocation(
       String countryName, String cityName) async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await firestore
@@ -109,5 +88,50 @@ class FirebaseDbService {
     }
     commentList.sort((a, b) => a.commentDate.compareTo(b.commentDate));
     return commentList;
+  }
+
+  Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
+    firestore.collection('users').doc(userId).update(newMap);
+    return true;
+  }
+
+  Future<bool> addSharing(SharingModel sharingModel) async {
+    Map<String, dynamic> sharingMap = sharingModel.toMap();
+    await firestore
+        .collection('sharings')
+        .doc(sharingModel.countryName)
+        .collection(sharingModel.cityName)
+        .doc(sharingModel.sharingID)
+        .set(sharingMap);
+    await firestore
+        .collection('sharingsbyuser')
+        .doc(sharingModel.userID)
+        .set({sharingModel.sharingID: sharingMap}, SetOptions(merge: true));
+
+    return true;
+  }
+
+  Future<bool> deleteSharing(SharingModel sharingModel) async {
+    await firestore
+        .collection('sharings')
+        .doc(sharingModel.countryName)
+        .collection(sharingModel.cityName)
+        .doc(sharingModel.sharingID)
+        .delete();
+
+    await firestore
+        .collection('sharingsbyuser')
+        .doc(sharingModel.userID)
+        .update({sharingModel.sharingID: FieldValue.delete()});
+
+    return true;
+  }
+
+  Future<bool> deleteComment(String sharingID, String commentID) async {
+    firestore
+        .collection('comments')
+        .doc(sharingID)
+        .update({commentID: FieldValue.delete()});
+    return true;
   }
 }

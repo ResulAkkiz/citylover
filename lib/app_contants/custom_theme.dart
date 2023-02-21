@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+Color twitterBlue = const Color(0xFF1DA1F2);
+
 final ThemeData customTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: const Color(0xffd3d3d3),

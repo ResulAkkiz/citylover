@@ -11,6 +11,7 @@ class UserModel {
   String? userProfilePict;
   LocationModel? lastState;
   LocationModel? lastCountry;
+  bool? status;
   UserModel({
     required this.userID,
     this.userName,
@@ -21,6 +22,7 @@ class UserModel {
     this.userProfilePict,
     this.lastState,
     this.lastCountry,
+    this.status,
   });
 
   Map<String, dynamic> toMap() {
@@ -34,6 +36,7 @@ class UserModel {
       'userProfilePict': userProfilePict,
       'lastState': lastState?.toMap(),
       'lastCountry': lastCountry?.toMap(),
+      'status': status
     };
   }
 
@@ -58,6 +61,7 @@ class UserModel {
       lastState: map['lastState'] != null
           ? LocationModel.fromMap(map['lastState'])
           : null,
+      status: map['status'] != null ? map['status'] as bool : null,
     );
   }
 
