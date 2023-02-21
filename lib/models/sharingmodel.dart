@@ -6,6 +6,7 @@ class SharingModel {
   String cityName;
   String sharingContent;
   DateTime sharingDate;
+  bool status;
   SharingModel({
     required this.sharingID,
     required this.userID,
@@ -13,6 +14,7 @@ class SharingModel {
     required this.cityName,
     required this.sharingContent,
     required this.sharingDate,
+    required this.status,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class SharingModel {
       'cityName': cityName,
       'sharingContent': sharingContent,
       'sharingDate': sharingDate.millisecondsSinceEpoch,
+      'status': status
     };
   }
 
@@ -33,6 +36,7 @@ class SharingModel {
       countryName: map['countryName'] as String,
       cityName: map['cityName'] as String,
       sharingContent: map['sharingContent'] as String,
+      status: map['status'] as bool,
       sharingDate:
           DateTime.fromMillisecondsSinceEpoch(map['sharingDate'] as int),
     );

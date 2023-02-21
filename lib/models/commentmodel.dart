@@ -5,6 +5,7 @@ class CommentModel {
   String userID;
   String commentContent;
   DateTime commentDate;
+  bool status;
 
   CommentModel({
     required this.commentID,
@@ -12,6 +13,7 @@ class CommentModel {
     required this.userID,
     required this.commentContent,
     required this.commentDate,
+    required this.status,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class CommentModel {
       'sharingID': sharingID,
       'userID': userID,
       'commentContent': commentContent,
+      'status': status,
       'commentDate': commentDate.millisecondsSinceEpoch,
     };
   }
@@ -30,6 +33,7 @@ class CommentModel {
       commentContent: map['commentContent'] as String,
       sharingID: map['sharingID'] as String,
       userID: map['userID'] as String,
+      status: map['status'] as bool,
       commentDate:
           DateTime.fromMillisecondsSinceEpoch(map['commentDate'] as int),
     );

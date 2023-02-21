@@ -25,6 +25,7 @@ class FirebaseAuthService {
       errorMessage = '';
       return userCredential.user != null
           ? UserModel(
+              status: true,
               userID: userCredential.user!.uid,
               userEmail: userCredential.user!.email!,
               userName: name,
@@ -38,7 +39,7 @@ class FirebaseAuthService {
     } on FirebaseAuthException catch (ex) {
       switch (ex.code) {
         case 'invalid-email':
-          errorMessage = 'Lütfen geçerli bir email adresi giriniz';
+          errorMessage = 'Lütfen geçerli bir email adresi giriniz.';
           break;
         case 'email-already-in-use':
           errorMessage = 'Email zaten başka bir hesap tarafından kullanılıyor.';

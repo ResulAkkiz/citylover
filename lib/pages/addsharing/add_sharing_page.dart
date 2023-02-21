@@ -1,4 +1,5 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
@@ -127,13 +128,15 @@ class _AddSharingPageState extends State<AddSharingPage> {
                             ? () async {
                                 bool? isSuccessful =
                                     await userViewModel.addSharing(SharingModel(
-                                  sharingID: getRandomString(12),
-                                  userID: user!.userID,
-                                  countryName: placeViewModel.country!.name,
-                                  cityName: placeViewModel.city!.name,
-                                  sharingContent: sharingController.text,
-                                  sharingDate: DateTime.now(),
-                                ));
+                                        sharingID: getRandomString(12),
+                                        userID: user!.userID,
+                                        countryName:
+                                            placeViewModel.country!.name,
+                                        cityName: placeViewModel.city!.name,
+                                        sharingContent:
+                                            sharingController.text.trim(),
+                                        sharingDate: DateTime.now(),
+                                        status: true));
                                 if (isSuccessful && mounted) {
                                   buildShowModelBottomSheet(
                                       context,
@@ -144,9 +147,12 @@ class _AddSharingPageState extends State<AddSharingPage> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: twitterBlue,
                             shape: const StadiumBorder()),
-                        child: const Text('Paylaş'),
+                        child: const Text(
+                          'Paylaş',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       )
                     ],
                   ).separated(

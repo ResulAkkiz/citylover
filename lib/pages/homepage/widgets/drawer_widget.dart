@@ -1,5 +1,6 @@
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_clipper.dart';
+import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/landingpage/landing_page.dart';
@@ -69,7 +70,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     final userViewModel = Provider.of<UserViewModel>(context);
     return SafeArea(
       child: Drawer(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.6,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
@@ -84,7 +85,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       ClipPath(
                         clipper: MyCustomClipper(),
                         child: Container(
-                          color: Theme.of(context).primaryColor,
+                          color: twitterBlue,
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * 0.25,
                         ),
@@ -98,9 +99,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               flex: 2,
                               child: InkWell(
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const ProfilePage(),
-                                  ));
+                                  if (userViewModel.user != null) {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => const ProfilePage(),
+                                    ));
+                                  }
                                 },
                                 child: CircleAvatar(
                                   radius: 32,
@@ -115,9 +119,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               child: Text(
                                 user != null
                                     ? '${user!.userName!} ${user!.userSurname!}'
-                                    : 'Anonim Kullanıcı',
+                                    : 'Hoşgeldiniz',
                                 style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.w500),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
                               ),
                             )
                           ],
@@ -130,7 +136,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).primaryColor,
                     ),
                     margin: const EdgeInsets.all(8.0),
                     child: Padding(
@@ -139,6 +144,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         children: [
                           isCountryReady
                               ? DropdownButtonFormField<LocationModel>(
+                                  focusColor: Colors.white,
                                   isExpanded: true,
                                   hint: const Text('Ülke'),
                                   value: countryValue,
@@ -169,6 +175,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                 ),
                           isStateReady
                               ? DropdownButtonFormField<LocationModel>(
+                                  focusColor: Colors.white,
                                   isExpanded: true,
                                   value: stateValue,
                                   hint: const Text('Şehir'),
@@ -203,12 +210,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                         'lastCountry': countryValue?.toMap(),
                                       });
                                     }
+                                    Navigator.of(context).pop();
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
+                                backgroundColor: twitterBlue,
                                 shape: const StadiumBorder()),
-                            child: const Text('Lokasyonu Değiştir'),
+                            child: const Text(
+                              'Lokasyonu Değiştir',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           )
                         ],
                       ).separated(

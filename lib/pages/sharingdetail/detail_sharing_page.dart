@@ -26,6 +26,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   late UserViewModel userViewModel;
   late UserModel userModel;
   bool isCommentsReady = false;
+
   @override
   void initState() {
     sharingModel = widget.sharingModel;
@@ -128,11 +129,91 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      '${currentUser.userName} ${currentUser.userSurname} ',
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '${currentUser.userName} ${currentUser.userSurname} ',
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        Builder(
+                                          builder: (context) {
+                                            if (userViewModel.user != null) {
+                                              if (currentComment.userID !=
+                                                  userViewModel.user!.userID) {
+                                                return IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () async {
+                                                    bool response =
+                                                        await buildShowDialog(
+                                                                context,
+                                                                const Text(
+                                                                    'Uyarı'),
+                                                                const Text(
+                                                                    'Seçmiş olduğunuz yorumu, raporlamak istediğinizden emin misiniz ?')) ??
+                                                            false;
+
+                                                    if (response) {
+                                                      //TODO: Yorum raporlama işlemleri
+                                                      debugPrint(
+                                                          'Yorum raporlama işlemleri');
+                                                    }
+                                                  },
+                                                  constraints:
+                                                      const BoxConstraints(),
+                                                  icon: const Icon(
+                                                    Icons
+                                                        .report_problem_outlined,
+                                                    size: 14,
+                                                  ),
+                                                );
+                                              } else {
+                                                return IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () async {
+                                                    bool response =
+                                                        await buildShowDialog(
+                                                                context,
+                                                                const Text(
+                                                                    'Uyarı'),
+                                                                const Text(
+                                                                    'Seçmiş olduğunuz yorumu, silmek istediğinizden emin misiniz ?')) ??
+                                                            false;
+
+                                                    if (response) {
+                                                      bool isSuccesful =
+                                                          await userViewModel
+                                                              .deleteComment(
+                                                                  currentComment
+                                                                      .sharingID,
+                                                                  currentComment
+                                                                      .commentID);
+                                                      if (isSuccesful &&
+                                                          mounted) {
+                                                        buildShowModelBottomSheet(
+                                                            context,
+                                                            'Yorum silme işlemi başarıyla gerçekleşti.',
+                                                            Icons.check);
+                                                      }
+                                                    }
+                                                  },
+                                                  constraints:
+                                                      const BoxConstraints(),
+                                                  icon: const Icon(
+                                                    Icons.clear,
+                                                    size: 14,
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              return const SizedBox();
+                                            }
+                                          },
+                                        ),
+                                      ],
                                     ),
                                     Text(
                                       currentComment.commentContent,
@@ -186,6 +267,28 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   }
 }
 
+Future<bool?> buildShowDialog(
+    BuildContext context, Widget title, Widget content) {
+  return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: title,
+            content: content,
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Hayır')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Evet')),
+            ],
+          ));
+}
+
 class CommentBox extends StatefulWidget {
   const CommentBox({
     super.key,
@@ -199,7 +302,7 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   late SharingModel sharingModel;
-
+  bool iconIgnore = false;
   UserModel? user;
   bool isUserReady = false;
   @override
@@ -278,27 +381,40 @@ class _CommentBoxState extends State<CommentBox> {
               ),
               Flexible(
                   flex: 1,
-                  child: IconButton(
-                    color: Colors.amber,
-                    icon: const Icon(Icons.arrow_forward_ios_outlined),
-                    onPressed: commentController.text.trim() != ''
-                        ? () async {
-                            bool isSuccessful = await userViewModel.addComment(
-                              CommentModel(
-                                  commentID: getRandomString(15),
-                                  sharingID: sharingModel.sharingID,
-                                  userID: user!.userID,
-                                  commentDate: DateTime.now(),
-                                  commentContent: commentController.text),
-                            );
-                            if (isSuccessful && mounted) {
-                              buildShowModelBottomSheet(context,
-                                  'Yorumunuz yayınlandı.', Icons.done_outlined);
-                              commentController.clear();
-                            }
-                          }
-                        : null,
-                  ))
+                  child: Builder(builder: (context) {
+                    return IgnorePointer(
+                      ignoring: iconIgnore,
+                      child: IconButton(
+                        color: Colors.amber,
+                        icon: const Icon(Icons.arrow_forward_ios_outlined),
+                        onPressed: commentController.text.trim() != ''
+                            ? () async {
+                                iconIgnore = true;
+                                setState(() {});
+                                debugPrint(iconIgnore.toString());
+                                bool isSuccessful =
+                                    await userViewModel.addComment(
+                                  CommentModel(
+                                      status: true,
+                                      commentID: getRandomString(15),
+                                      sharingID: sharingModel.sharingID,
+                                      userID: user!.userID,
+                                      commentDate: DateTime.now(),
+                                      commentContent: commentController.text),
+                                );
+                                if (isSuccessful && mounted) {
+                                  buildShowModelBottomSheet(
+                                      context,
+                                      'Yorumunuz yayınlandı.',
+                                      Icons.done_outlined);
+                                  commentController.clear();
+                                }
+                                iconIgnore = false;
+                              }
+                            : null,
+                      ),
+                    );
+                  }))
             ],
           ),
         ),

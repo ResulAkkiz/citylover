@@ -1,11 +1,16 @@
 import 'dart:io';
 
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/app_contants/string_generator.dart';
+import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/common_widgets/datetime_picker_widget.dart';
+import 'package:citylover/models/usermodel.dart';
+import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -127,6 +132,9 @@ class _SignupPageState extends State<SignupPage> {
                     child: Column(
                       children: [
                         TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(20),
+                          ],
                           keyboardType: TextInputType.name,
                           controller: nameController,
                           validator: (value) {
@@ -139,6 +147,9 @@ class _SignupPageState extends State<SignupPage> {
                               hintText: 'İsim', labelText: 'İsim'),
                         ),
                         TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(15),
+                          ],
                           keyboardType: TextInputType.name,
                           controller: surnameController,
                           validator: (value) {
@@ -151,6 +162,9 @@ class _SignupPageState extends State<SignupPage> {
                               hintText: 'Soyisim', labelText: 'Soyisim'),
                         ),
                         TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(35),
+                          ],
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Lütfen e-mail adresinizi giriniz.";
@@ -163,6 +177,9 @@ class _SignupPageState extends State<SignupPage> {
                               hintText: 'E-mail', labelText: 'E-mail'),
                         ),
                         TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(12),
+                          ],
                           controller: passwordController,
                           obscureText: obscurePassword,
                           validator: (value) {
@@ -259,6 +276,13 @@ class _SignupPageState extends State<SignupPage> {
                                   formKey.currentState!.save();
                                   if (formKey.currentState!.validate()) {
                                     showModalBottomSheet(
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(24.0),
+                                            topRight: Radius.circular(24.0)),
+                                      ),
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
                                       context: context,
                                       builder: (context) {
                                         return SizedBox(
@@ -266,32 +290,47 @@ class _SignupPageState extends State<SignupPage> {
                                                     .size
                                                     .height *
                                                 0.2,
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: twitterBlue,
+                                              ),
                                             ));
                                       },
                                     );
-                                    userViewModel.createEmailPassword(
-                                        email: emailController.text,
-                                        password: passwordController.text,
-                                        birthdate: birthdate,
-                                        name: nameController.text,
-                                        surname: surnameController.text,
-                                        userGender: choose.toString(),
-                                        lastCountry: placeViewModel.country,
-                                        lastState: placeViewModel.city,
-                                        userProfilePict:
-                                            await userViewModel.uploadFile(
-                                                getRandomString(12),
-                                                'profilephoto',
-                                                userPhoto!));
-                                    if (mounted) {
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LandingScreen()),
-                                          (Route<dynamic> route) => false);
+                                    UserModel? userModel =
+                                        await userViewModel.createEmailPassword(
+                                            email: emailController.text,
+                                            password: passwordController.text,
+                                            birthdate: birthdate,
+                                            name: nameController.text,
+                                            surname: surnameController.text,
+                                            userGender: choose.toString(),
+                                            lastCountry: placeViewModel.country,
+                                            lastState: placeViewModel.city,
+                                            userProfilePict:
+                                                await userViewModel.uploadFile(
+                                                    getRandomString(12),
+                                                    'profilephoto',
+                                                    userPhoto!));
+                                    if (userModel != null) {
+                                      if (mounted) {
+                                        Navigator.of(context).pop();
+                                        Navigator.of(
+                                                context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const LandingScreen()),
+                                                (Route<dynamic> route) =>
+                                                    false);
+                                      }
+                                    } else {
+                                      if (mounted) {
+                                        Navigator.of(context).pop();
+                                        buildShowModelBottomSheet(context,
+                                            errorMessage, Icons.dangerous);
+                                      }
+                                      errorMessage = '';
                                     }
                                   }
                                   isErrorVisible = false;

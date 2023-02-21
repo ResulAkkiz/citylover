@@ -89,6 +89,18 @@ class UserViewModel extends ChangeNotifier {
     return await firebaseDbService.addSharing(sharingModel);
   }
 
+  Future<bool> deleteComment(
+    String sharingID,
+    String commentID,
+  ) async {
+    bool isSuccesful = await firebaseDbService.deleteComment(
+      sharingID,
+      commentID,
+    );
+    getComments(sharingID);
+    return isSuccesful;
+  }
+
   Future<String> uploadFile(String userID, String fileType, File uploadedFile) {
     return firebaseStorageService.uploadFile(userID, fileType, uploadedFile);
   }
@@ -126,5 +138,11 @@ class UserViewModel extends ChangeNotifier {
 
   Future<bool> updateEmail(String newEmail, String password) async {
     return await firebaseAuthService.updateEmail(newEmail, password);
+  }
+
+  Future<bool> deleteSharing(SharingModel sharingModel) async {
+    bool isSuccesful = await firebaseDbService.deleteSharing(sharingModel);
+    getSharingsbyLocation(sharingModel.countryName, sharingModel.cityName);
+    return isSuccesful;
   }
 }

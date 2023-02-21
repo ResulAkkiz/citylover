@@ -14,9 +14,11 @@ Widget buildDateTimePicker({
           initialEntryMode: DatePickerEntryMode.calendarOnly,
           context: context,
           initialDatePickerMode: DatePickerMode.year,
-          initialDate: DateTime.now().subtract(const Duration(days: 6 * 365)),
+          initialDate:
+              DateTime.now().subtract(const Duration(days: (18 * 365) + 4)),
           firstDate: DateTime(1923),
-          lastDate: DateTime.now().subtract(const Duration(days: 6 * 365)));
+          lastDate:
+              DateTime.now().subtract(const Duration(days: (18 * 365) + 4)));
       if (date == null) return;
       controller.text = DateFormat('dd/MM/yyyy').format(date);
       onSelected(date);
