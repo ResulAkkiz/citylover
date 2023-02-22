@@ -1,4 +1,5 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
@@ -69,6 +70,7 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: Visibility(
           visible: userViewModel.user != null,
           child: FloatingActionButton(
+            backgroundColor: twitterBlue,
             child: const Icon(
               Icons.add_rounded,
               size: 48,
@@ -218,11 +220,22 @@ class _HomePageState extends State<HomePage> {
                                                                     const Text(
                                                                         'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
                                                                 false;
-
                                                         if (response) {
-                                                          //TODO: Yorum raporlama işlemleri
+                                                          bool isSuccessful =
+                                                              await userViewModel
+                                                                  .reportSharing(
+                                                                      currentSharing);
                                                           debugPrint(
-                                                              'Yorum raporlama işlemleri');
+                                                              isSuccessful
+                                                                  .toString());
+                                                          if (isSuccessful &&
+                                                              mounted) {
+                                                            buildShowModelBottomSheet(
+                                                                context,
+                                                                'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
+                                                                Icons
+                                                                    .report_problem);
+                                                          }
                                                         }
                                                       },
                                                       constraints:

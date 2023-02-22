@@ -7,6 +7,7 @@ import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../common_widgets/custom_model_sheet.dart';
@@ -22,6 +23,7 @@ class _AddSharingPageState extends State<AddSharingPage> {
   UserModel? user;
   String? country;
   String? city;
+  bool buttonIgnore = false;
 
   bool isUserReady = false;
   @override
@@ -95,6 +97,11 @@ class _AddSharingPageState extends State<AddSharingPage> {
                           onChanged: (value) {
                             setState(() {});
                           },
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(
+                                '[a-z A-Z á-ú Á-Ú 0-9 !@#%^&*(),.?":{}|<>]')),
+                            FilteringTextInputFormatter.deny(RegExp('  +')),
+                          ],
                           decoration: InputDecoration(
                               fillColor: Theme.of(context).primaryColor,
                               filled: true),
@@ -123,35 +130,49 @@ class _AddSharingPageState extends State<AddSharingPage> {
                           maxLength: 350,
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: sharingController.text.trim() != ''
-                            ? () async {
-                                bool? isSuccessful =
-                                    await userViewModel.addSharing(SharingModel(
-                                        sharingID: getRandomString(12),
-                                        userID: user!.userID,
-                                        countryName:
-                                            placeViewModel.country!.name,
-                                        cityName: placeViewModel.city!.name,
-                                        sharingContent:
-                                            sharingController.text.trim(),
-                                        sharingDate: DateTime.now(),
-                                        status: true));
-                                if (isSuccessful && mounted) {
-                                  buildShowModelBottomSheet(
-                                      context,
-                                      'Paylaşım işlemi başarılı bir şekilde gerçekleşti.',
-                                      Icons.done_outlined);
-                                  sharingController.clear();
+                      IgnorePointer(
+                        ignoring: buttonIgnore,
+                        child: ElevatedButton(
+                          onPressed: sharingController.text.trim() != ''
+                              ? () async {
+                                  buttonIgnore = true;
+                                  setState(() {});
+                                  bool? isSuccessful = await userViewModel
+                                      .addSharing(SharingModel(
+                                          sharingID: getRandomString(12),
+                                          userID: user!.userID,
+                                          countryName:
+                                              placeViewModel.country!.name,
+                                          cityName: placeViewModel.city!.name,
+                                          sharingContent:
+                                              sharingController.text.trim(),
+                                          sharingDate: DateTime.now(),
+                                          status: true));
+                                  if (isSuccessful && mounted) {
+                                    buildShowModelBottomSheet(
+                                        context,
+                                        'Paylaşım işlemi başarılı bir şekilde gerçekleşti.',
+                                        Icons.done_outlined);
+                                    sharingController.clear();
+                                    Future.delayed(const Duration(seconds: 1))
+                                        .then((value) => Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const HomePage()),
+                                                (Route<dynamic> route) =>
+                                                    false));
+                                  }
+                                  buttonIgnore = false;
                                 }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: twitterBlue,
-                            shape: const StadiumBorder()),
-                        child: const Text(
-                          'Paylaş',
-                          style: TextStyle(color: Colors.white),
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: twitterBlue,
+                              shape: const StadiumBorder()),
+                          child: const Text(
+                            'Paylaş',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       )
                     ],

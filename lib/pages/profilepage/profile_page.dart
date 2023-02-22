@@ -6,6 +6,7 @@ import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
 import 'package:citylover/pages/updateEmail/update_email_page.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -292,7 +293,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             itemBuilder: (context, index) {
                               SharingModel currentSharing = sharingList[index];
                               return ListTile(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailSharingPage(
+                                            sharingModel: currentSharing,
+                                            userModel: user!),
+                                      ),
+                                    );
+                                  },
                                   leading: CircleAvatar(
                                     backgroundImage:
                                         NetworkImage(user!.userProfilePict!),
@@ -340,7 +349,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             },
                             separatorBuilder: (context, index) {
                               return const Divider(
-                                thickness: 1.2,
+                                thickness: 4,
                                 color: Colors.white,
                               );
                             },
