@@ -48,6 +48,10 @@ class _FirstPageState extends State<FirstPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 36.0),
                 child: Column(children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0),
+                      child:
+                          Image.asset('assets/images/im_city.png', scale: 5)),
                   isCountryReady
                       ? DropdownButtonFormField<LocationModel>(
                           isExpanded: true,

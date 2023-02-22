@@ -145,4 +145,12 @@ class UserViewModel extends ChangeNotifier {
     getSharingsbyLocation(sharingModel.countryName, sharingModel.cityName);
     return isSuccesful;
   }
+
+  Future<bool> reportSharing(SharingModel sharingModel) async {
+    return await firebaseDbService.reportSharing(sharingModel);
+  }
+
+  Future<bool> reportComment(CommentModel commentModel) async {
+    return await firebaseDbService.reportComment(commentModel);
+  }
 }

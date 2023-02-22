@@ -128,10 +128,28 @@ class FirebaseDbService {
   }
 
   Future<bool> deleteComment(String sharingID, String commentID) async {
-    firestore
+    await firestore
         .collection('comments')
         .doc(sharingID)
         .update({commentID: FieldValue.delete()});
+    return true;
+  }
+
+  Future<bool> reportSharing(SharingModel sharingModel) async {
+    Map<String, dynamic> sharingMap = sharingModel.toMap();
+    await firestore
+        .collection('reporteds')
+        .doc('sharings')
+        .set({sharingModel.sharingID: sharingMap}, SetOptions(merge: true));
+    return true;
+  }
+
+  Future<bool> reportComment(CommentModel commentModel) async {
+    Map<String, dynamic> commentMap = commentModel.toMap();
+    await firestore
+        .collection('reporteds')
+        .doc('comments')
+        .set({commentModel.commentID: commentMap}, SetOptions(merge: true));
     return true;
   }
 }

@@ -1,5 +1,7 @@
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
+import 'package:citylover/pages/landingpage/landing_page.dart';
 import 'package:citylover/pages/resetPassword/reset_password_page.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
@@ -103,14 +105,40 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () async {
                           formKey.currentState!.save();
                           if (formKey.currentState!.validate()) {
+                            showModalBottomSheet(
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(24.0),
+                                    topRight: Radius.circular(24.0)),
+                              ),
+                              backgroundColor: Theme.of(context).primaryColor,
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.2,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: twitterBlue,
+                                      ),
+                                    ));
+                              },
+                            );
                             await userViewModel.signInEmailPassword(
                                 emailController.text, passwordController.text);
                             if (mounted && userViewModel.user != null) {
                               Navigator.of(context).pop();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LandingScreen()),
+                                  (Route<dynamic> route) => false);
                             } else {
                               if (mounted) {
+                                Navigator.of(context).pop();
                                 buildShowModelBottomSheet(context, errorMessage,
                                     Icons.question_mark_outlined);
+                                errorMessage = '';
                               }
                             }
                           }
