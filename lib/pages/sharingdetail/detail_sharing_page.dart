@@ -83,7 +83,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${userModel.userName}${userModel.userSurname}',
+                        '${userModel.userName} ${userModel.userSurname}',
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w500),
                       ),
@@ -134,7 +134,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '${currentUser.userName}${currentUser.userSurname}',
+                                          '${currentUser.userName} ${currentUser.userSurname}',
                                           style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500),

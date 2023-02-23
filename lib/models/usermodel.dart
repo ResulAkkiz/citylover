@@ -12,18 +12,19 @@ class UserModel {
   LocationModel? lastState;
   LocationModel? lastCountry;
   bool? status;
-  UserModel({
-    required this.userID,
-    this.userName,
-    this.userSurname,
-    required this.userEmail,
-    this.userBirthdate,
-    this.userGender,
-    this.userProfilePict,
-    this.lastState,
-    this.lastCountry,
-    this.status,
-  });
+  int? role;
+  UserModel(
+      {required this.userID,
+      this.userName,
+      this.userSurname,
+      required this.userEmail,
+      this.userBirthdate,
+      this.userGender,
+      this.userProfilePict,
+      this.lastState,
+      this.lastCountry,
+      this.status,
+      this.role});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -36,7 +37,8 @@ class UserModel {
       'userProfilePict': userProfilePict,
       'lastState': lastState?.toMap(),
       'lastCountry': lastCountry?.toMap(),
-      'status': status
+      'status': status,
+      'role': role,
     };
   }
 
@@ -62,6 +64,7 @@ class UserModel {
           ? LocationModel.fromMap(map['lastState'])
           : null,
       status: map['status'] != null ? map['status'] as bool : null,
+      role: map['role'] != null ? map['role'] as int : null,
     );
   }
 

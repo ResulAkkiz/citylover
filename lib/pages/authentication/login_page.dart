@@ -124,15 +124,34 @@ class _LoginPageState extends State<LoginPage> {
                                     ));
                               },
                             );
-                            await userViewModel.signInEmailPassword(
+                            var user = await userViewModel.signInEmailPassword(
                                 emailController.text, passwordController.text);
-                            if (mounted && userViewModel.user != null) {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LandingScreen()),
-                                  (Route<dynamic> route) => false);
+
+                            if (userViewModel.user != null) {
+                              var usermodel =
+                                  await userViewModel.readUser(user!.userID);
+                              if (mounted && usermodel!.status!) {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LandingScreen()),
+                                    (Route<dynamic> route) => false);
+                              } else {
+                                await userViewModel.signOut();
+                                if (mounted) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LandingScreen()),
+                                      (Route<dynamic> route) => false);
+
+                                  buildShowModelBottomSheet(
+                                      context,
+                                      'Girmiş olduğunuz hesabınız, toplum kurallarına uygun olmayan davranışlarınız sebebiyle banlanmıştır.',
+                                      Icons.report);
+                                }
+                              }
                             } else {
                               if (mounted) {
                                 Navigator.of(context).pop();

@@ -34,7 +34,8 @@ class FirebaseAuthService {
               userGender: userGender,
               userProfilePict: userProfilePict,
               lastCountry: lastCountry,
-              lastState: lastState)
+              lastState: lastState,
+              role: 0)
           : null;
     } on FirebaseAuthException catch (ex) {
       switch (ex.code) {
