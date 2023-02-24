@@ -34,7 +34,8 @@ class FirebaseAuthService {
               userGender: userGender,
               userProfilePict: userProfilePict,
               lastCountry: lastCountry,
-              lastState: lastState)
+              lastState: lastState,
+              role: 0)
           : null;
     } on FirebaseAuthException catch (ex) {
       switch (ex.code) {
@@ -83,9 +84,10 @@ class FirebaseAuthService {
       errorMessage = '';
       return userToUserModel(userCredential.user);
     } on FirebaseAuthException catch (ex) {
+      debugPrint(ex.code);
       switch (ex.code) {
         case 'invalid-email':
-          errorMessage = 'Lütfen geçerli bir email adresi giriniz';
+          errorMessage = 'Lütfen geçerli bir email adresi giriniz.';
           break;
         case 'email-already-in-use':
           errorMessage = 'Email zaten başka bir hesap tarafından kullanılıyor.';
@@ -96,8 +98,13 @@ class FirebaseAuthService {
         case 'wrong-password':
           errorMessage = 'Lütfen parolanızı kontrol ediniz.';
           break;
+        case 'too-many-requests':
+          errorMessage = 'Hata oluştu.Lütfen tekrar deneyiniz.';
+          break;
 
         default:
+          errorMessage = 'Hata: ${ex.code}';
+          debugPrint(ex.code);
       }
       return null;
     }

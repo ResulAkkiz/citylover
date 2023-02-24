@@ -385,6 +385,7 @@ final ThemeData customTheme = ThemeData(
     ),
     borderRadius: BorderRadius.all(Radius.circular(0.0)),
   )),
+  appBarTheme: AppBarTheme(color: twitterBlue),
   bottomAppBarTheme: const BottomAppBarTheme(color: Color(0xffffffff)),
   switchTheme: SwitchThemeData(
     thumbColor:

@@ -102,9 +102,8 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                 '[a-z A-Z á-ú Á-Ú 0-9 !@#%^&*(),.?":{}|<>]')),
                             FilteringTextInputFormatter.deny(RegExp('  +')),
                           ],
-                          decoration: InputDecoration(
-                              fillColor: Theme.of(context).primaryColor,
-                              filled: true),
+                          decoration: const InputDecoration(
+                              fillColor: Colors.white, filled: true),
                           buildCounter: (context,
                               {required currentLength,
                               required isFocused,

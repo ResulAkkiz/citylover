@@ -302,8 +302,9 @@ class _SignupPageState extends State<SignupPage> {
                                             email: emailController.text,
                                             password: passwordController.text,
                                             birthdate: birthdate,
-                                            name: nameController.text,
-                                            surname: surnameController.text,
+                                            name: nameController.text.trim(),
+                                            surname:
+                                                surnameController.text.trim(),
                                             userGender: choose.toString(),
                                             lastCountry: placeViewModel.country,
                                             lastState: placeViewModel.city,
