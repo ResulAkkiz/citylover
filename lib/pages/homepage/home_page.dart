@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                 child: SafeArea(
                   child: Center(
                     child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.all(12.0),
                       itemBuilder: (context, index) {
                         SharingModel currentSharing =
                             userViewModel.sharingList[index];
@@ -139,6 +139,7 @@ class _HomePageState extends State<HomePage> {
                                       ));
                                     },
                                     child: CircleAvatar(
+                                      radius: 28,
                                       backgroundImage: NetworkImage(
                                           currentUser!.userProfilePict!),
                                     ),
@@ -151,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                                         currentSharing.sharingContent,
                                         style: const TextStyle(
                                           color: Colors.black54,
-                                          fontSize: 12,
+                                          fontSize: 15,
                                         ),
                                       ),
                                       Row(

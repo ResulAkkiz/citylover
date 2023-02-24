@@ -136,7 +136,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                         Text(
                                           '${currentUser.userName} ${currentUser.userSurname}',
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.w500),
                                         ),
                                         Builder(
@@ -228,7 +228,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                       currentComment.commentContent,
                                       style: const TextStyle(
                                         color: Colors.black54,
-                                        fontSize: 12,
+                                        fontSize: 14,
                                       ),
                                     ),
                                     Text(
