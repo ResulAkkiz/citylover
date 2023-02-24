@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                       ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Image.asset('assets/images/im_city.png',
-                              scale: 5)),
+                              scale: 2)),
                       TextFormField(
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -126,7 +126,6 @@ class _LoginPageState extends State<LoginPage> {
                             );
                             var user = await userViewModel.signInEmailPassword(
                                 emailController.text, passwordController.text);
-
                             if (userViewModel.user != null) {
                               var usermodel =
                                   await userViewModel.readUser(user!.userID);

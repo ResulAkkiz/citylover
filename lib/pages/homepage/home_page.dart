@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: twitterBlue,
           elevation: 0,
           centerTitle: true,
           title: FittedBox(
@@ -101,214 +101,226 @@ class _HomePageState extends State<HomePage> {
         ),
         drawer: const DrawerWidget(),
         body: isSharingListReady
-            ? SafeArea(
-                child: Center(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemBuilder: (context, index) {
-                      SharingModel currentSharing =
-                          userViewModel.sharingList[index];
-                      return FutureBuilder<UserModel?>(
-                          future: userViewModel.readUser(currentSharing.userID),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<UserModel?> snapshot) {
-                            if (snapshot.hasData) {
-                              var currentUser = snapshot.data;
-                              return ListTile(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => DetailSharingPage(
-                                        userModel: currentUser,
-                                        sharingModel: currentSharing),
-                                  ));
-                                },
-                                leading: InkWell(
+            ? RefreshIndicator(
+                onRefresh: () async {
+                  return await userViewModel.getSharingsbyLocation(
+                      placeViewModel.country!.name, placeViewModel.city!.name);
+                },
+                child: SafeArea(
+                  child: Center(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemBuilder: (context, index) {
+                        SharingModel currentSharing =
+                            userViewModel.sharingList[index];
+                        return FutureBuilder<UserModel?>(
+                            future:
+                                userViewModel.readUser(currentSharing.userID),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<UserModel?> snapshot) {
+                              if (snapshot.hasData) {
+                                var currentUser = snapshot.data;
+                                return ListTile(
                                   onTap: () {
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          OtherUserProfilePage(
-                                              userID: currentUser.userID),
+                                      builder: (context) => DetailSharingPage(
+                                          userModel: currentUser,
+                                          sharingModel: currentSharing),
                                     ));
                                   },
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        currentUser!.userProfilePict!),
-                                  ),
-                                ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currentSharing.sharingContent,
-                                      style: const TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 12,
-                                      ),
+                                  leading: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            OtherUserProfilePage(
+                                                userID: currentUser.userID),
+                                      ));
+                                    },
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          currentUser!.userProfilePict!),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          DateFormat('HH:mm•dd/MM/yyyy').format(
-                                              currentSharing.sharingDate),
-                                          // '11:12 • 11/02/2023',
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.black54,
+                                  ),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        currentSharing.sharingContent,
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            DateFormat('HH:mm•dd/MM/yyyy')
+                                                .format(
+                                                    currentSharing.sharingDate),
+                                            // '11:12 • 11/02/2023',
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.black54,
+                                            ),
                                           ),
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.comment,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(
-                                              width: 4,
-                                            ),
-                                            FutureBuilder(
-                                                future: userViewModel
-                                                    .getCommentsList(
-                                                        currentSharing
-                                                            .sharingID),
-                                                builder: (context,
-                                                    AsyncSnapshot snapshot) {
-                                                  if (snapshot.hasData) {
-                                                    List<CommentModel>
-                                                        commentList =
-                                                        snapshot.data;
-                                                    int listLength =
-                                                        commentList.length;
-                                                    return Text(
-                                                      listLength.toString(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black54,
-                                                        fontSize: 12,
-                                                      ),
-                                                    );
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Center(
-                                                        child: Text(snapshot
-                                                            .error
-                                                            .toString()));
-                                                  } else {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    );
-                                                  }
-                                                }),
-                                            Builder(
-                                              builder: (context) {
-                                                if (userViewModel.user !=
-                                                    null) {
-                                                  if (currentSharing.userID !=
-                                                      userViewModel
-                                                          .user!.userID) {
-                                                    return IconButton(
-                                                      padding: EdgeInsets.zero,
-                                                      onPressed: () async {
-                                                        bool response =
-                                                            await buildShowDialog(
-                                                                    context,
-                                                                    const Text(
-                                                                        'Uyarı'),
-                                                                    const Text(
-                                                                        'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
-                                                                false;
-                                                        if (response) {
-                                                          bool isSuccessful =
-                                                              await userViewModel
-                                                                  .reportSharing(
-                                                                      currentSharing);
-                                                          debugPrint(
-                                                              isSuccessful
-                                                                  .toString());
-                                                          if (isSuccessful &&
-                                                              mounted) {
-                                                            buildShowModelBottomSheet(
-                                                                context,
-                                                                'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
-                                                                Icons
-                                                                    .report_problem);
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.comment,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(
+                                                width: 4,
+                                              ),
+                                              FutureBuilder(
+                                                  future: userViewModel
+                                                      .getCommentsList(
+                                                          currentSharing
+                                                              .sharingID),
+                                                  builder: (context,
+                                                      AsyncSnapshot snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      List<CommentModel>
+                                                          commentList =
+                                                          snapshot.data;
+                                                      int listLength =
+                                                          commentList.length;
+                                                      return Text(
+                                                        listLength.toString(),
+                                                        style: const TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: 12,
+                                                        ),
+                                                      );
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return Center(
+                                                          child: Text(snapshot
+                                                              .error
+                                                              .toString()));
+                                                    } else {
+                                                      return const Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      );
+                                                    }
+                                                  }),
+                                              Builder(
+                                                builder: (context) {
+                                                  if (userViewModel.user !=
+                                                      null) {
+                                                    if (currentSharing.userID !=
+                                                        userViewModel
+                                                            .user!.userID) {
+                                                      return IconButton(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        onPressed: () async {
+                                                          bool response =
+                                                              await buildShowDialog(
+                                                                      context,
+                                                                      const Text(
+                                                                          'Uyarı'),
+                                                                      const Text(
+                                                                          'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
+                                                                  false;
+                                                          if (response) {
+                                                            bool isSuccessful =
+                                                                await userViewModel
+                                                                    .reportSharing(
+                                                                        currentSharing);
+                                                            debugPrint(
+                                                                isSuccessful
+                                                                    .toString());
+                                                            if (isSuccessful &&
+                                                                mounted) {
+                                                              buildShowModelBottomSheet(
+                                                                  context,
+                                                                  'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
+                                                                  Icons
+                                                                      .report_problem);
+                                                            }
                                                           }
-                                                        }
-                                                      },
-                                                      constraints:
-                                                          const BoxConstraints(),
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .report_problem_outlined,
-                                                        size: 14,
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    return IconButton(
-                                                      padding: EdgeInsets.zero,
-                                                      onPressed: () async {
-                                                        bool response =
-                                                            await buildShowDialog(
-                                                                    context,
-                                                                    const Text(
-                                                                        'Uyarı'),
-                                                                    const Text(
-                                                                        'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
-                                                                false;
+                                                        },
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .report_problem_outlined,
+                                                          size: 14,
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return IconButton(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        onPressed: () async {
+                                                          bool response =
+                                                              await buildShowDialog(
+                                                                      context,
+                                                                      const Text(
+                                                                          'Uyarı'),
+                                                                      const Text(
+                                                                          'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
+                                                                  false;
 
-                                                        if (response) {
-                                                          bool isSuccesful =
-                                                              await userViewModel
-                                                                  .deleteSharing(
-                                                                      currentSharing);
-                                                          if (isSuccesful &&
-                                                              mounted) {
-                                                            buildShowModelBottomSheet(
-                                                                context,
-                                                                'Paylaşım silme işlemi başarıyla gerçekleşti.',
-                                                                Icons.check);
+                                                          if (response) {
+                                                            bool isSuccesful =
+                                                                await userViewModel
+                                                                    .deleteSharing(
+                                                                        currentSharing);
+                                                            if (isSuccesful &&
+                                                                mounted) {
+                                                              buildShowModelBottomSheet(
+                                                                  context,
+                                                                  'Paylaşım silme işlemi başarıyla gerçekleşti.',
+                                                                  Icons.check);
+                                                            }
                                                           }
-                                                        }
-                                                      },
-                                                      constraints:
-                                                          const BoxConstraints(),
-                                                      icon: const Icon(
-                                                        Icons.clear,
-                                                        size: 14,
-                                                      ),
-                                                    );
+                                                        },
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                        icon: const Icon(
+                                                          Icons.clear,
+                                                          size: 14,
+                                                        ),
+                                                      );
+                                                    }
+                                                  } else {
+                                                    return const SizedBox();
                                                   }
-                                                } else {
-                                                  return const SizedBox();
-                                                }
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ).separated(const SizedBox(
-                                  height: 8,
-                                )),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text(snapshot.error.toString()),
-                              );
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                          });
-                    },
-                    itemCount: userViewModel.sharingList.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const Divider(thickness: 1.2);
-                    },
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ).separated(const SizedBox(
+                                    height: 8,
+                                  )),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(snapshot.error.toString()),
+                                );
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            });
+                      },
+                      itemCount: userViewModel.sharingList.length,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(thickness: 1.2);
+                      },
+                    ),
                   ),
                 ),
               )

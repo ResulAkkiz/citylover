@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
-            child: Image.asset('assets/images/im_city.png', scale: 5)),
+            child: Image.asset('assets/images/im_city.png', scale: 2)),
       ),
     );
   }

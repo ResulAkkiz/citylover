@@ -51,7 +51,7 @@ class _FirstPageState extends State<FirstPage> {
                   ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
                       child:
-                          Image.asset('assets/images/im_city.png', scale: 5)),
+                          Image.asset('assets/images/im_city.png', scale: 2)),
                   isCountryReady
                       ? DropdownButtonFormField<LocationModel>(
                           isExpanded: true,
