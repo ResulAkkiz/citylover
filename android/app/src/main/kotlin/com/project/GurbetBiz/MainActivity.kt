@@ -1,4 +1,4 @@
-package com.example.citylover
+package com.project.GurbetBiz
 
 import io.flutter.embedding.android.FlutterActivity
 
