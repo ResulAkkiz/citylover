@@ -68,256 +68,250 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
-    return SafeArea(
-      child: Drawer(
-        width: MediaQuery.of(context).size.width * 0.6,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
-        ),
-        child: isUserReady
-            ? SingleChildScrollView(
-                child: Column(children: [
-                  Stack(
-                    fit: StackFit.loose,
-                    alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      ClipPath(
-                        clipper: MyCustomClipper(),
-                        child: Container(
-                          color: twitterBlue,
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.25,
-                        ),
+    return Drawer(
+      width: MediaQuery.of(context).size.width * 0.6,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+      ),
+      child: isUserReady
+          ? SingleChildScrollView(
+              child: Column(children: [
+                Stack(
+                  fit: StackFit.loose,
+                  alignment: AlignmentDirectional.centerStart,
+                  children: [
+                    ClipPath(
+                      clipper: MyCustomClipper(),
+                      child: Container(
+                        color: twitterBlue,
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.25,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Flex(
-                          direction: Axis.horizontal,
-                          children: [
-                            Flexible(
-                              flex: 2,
-                              child: InkWell(
-                                onTap: () {
-                                  if (userViewModel.user != null) {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => const ProfilePage(),
-                                    ));
-                                  }
-                                },
-                                child: CircleAvatar(
-                                  radius: 32,
-                                  backgroundImage: NetworkImage(user != null
-                                      ? user!.userProfilePict!
-                                      : 'https://w7.pngwing.com/pngs/980/304/png-transparent-computer-icons-user-profile-avatar-heroes-silhouette-avatar.png'),
-                                ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: InkWell(
+                              onTap: () {
+                                if (userViewModel.user != null) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => const ProfilePage(),
+                                  ));
+                                }
+                              },
+                              child: CircleAvatar(
+                                radius: 32,
+                                backgroundImage: NetworkImage(user != null
+                                    ? user!.userProfilePict!
+                                    : 'https://w7.pngwing.com/pngs/980/304/png-transparent-computer-icons-user-profile-avatar-heroes-silhouette-avatar.png'),
                               ),
                             ),
-                            Flexible(
-                              flex: 5,
-                              child: Text(
-                                user != null
-                                    ? '${user!.userName!} ${user!.userSurname!}'
-                                    : 'Hoşgeldiniz',
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ),
-                            )
-                          ],
-                        ).separated(const SizedBox(
-                          width: 12,
-                        )),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: const EdgeInsets.all(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        children: [
-                          isCountryReady
-                              ? DropdownButtonFormField<LocationModel>(
-                                  focusColor: Colors.white,
-                                  isExpanded: true,
-                                  hint: const Text('Ülke'),
-                                  value: countryValue,
-                                  items: placeViewModel.countryNameList
-                                      .map((LocationModel value) {
-                                    return DropdownMenuItem<LocationModel>(
-                                      value: value,
-                                      child: Text(value.name),
-                                    );
-                                  }).toList(),
-                                  onChanged: (LocationModel? model) async {
-                                    if (model != null) {
-                                      isStateReady = false;
-                                      stateList = await placeViewModel
-                                          .loadTempStates(model.id);
-                                      countryValue = model;
-                                      stateValue = stateList.isNotEmpty
-                                          ? stateList.first
-                                          : null;
-
-                                      isStateReady = true;
-                                    }
-                                    setState(() {});
-                                  },
-                                )
-                              : const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                          isStateReady
-                              ? DropdownButtonFormField<LocationModel>(
-                                  focusColor: Colors.white,
-                                  isExpanded: true,
-                                  value: stateValue,
-                                  hint: const Text('Şehir'),
-                                  items: stateList.map((LocationModel value) {
-                                    return DropdownMenuItem<LocationModel>(
-                                      value: value,
-                                      child: Text(value.name),
-                                    );
-                                  }).toList(),
-                                  onChanged: (model) {
-                                    stateValue = model;
-                                    setState(() {});
-                                  },
-                                )
-                              : const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                          ElevatedButton(
-                            onPressed: (countryValue != null &&
-                                    stateValue != null)
-                                ? () {
-                                    placeViewModel.stateNameList = stateList;
-                                    placeViewModel.savePlace(
-                                        cityName: stateValue!,
-                                        countryName: countryValue!);
-                                    userViewModel.getSharingsbyLocation(
-                                        countryValue!.name, stateValue!.name);
-                                    if (userViewModel.user != null) {
-                                      userViewModel.updateUser(
-                                          userViewModel.user!.userID, {
-                                        'lastState': stateValue?.toMap(),
-                                        'lastCountry': countryValue?.toMap(),
-                                      });
-                                    }
-                                    Navigator.of(context).pop();
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: twitterBlue,
-                                shape: const StadiumBorder()),
-                            child: const Text(
-                              'Lokasyonu Değiştir',
-                              style: TextStyle(color: Colors.white),
+                          ),
+                          Flexible(
+                            flex: 5,
+                            child: Text(
+                              user != null
+                                  ? '${user!.userName!} ${user!.userSurname!}'
+                                  : 'Hoşgeldiniz',
+                              style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
                             ),
                           )
                         ],
-                      ).separated(
-                        const SizedBox(
-                          height: 16,
-                        ),
+                      ).separated(const SizedBox(
+                        width: 12,
+                      )),
+                    ),
+                  ],
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Column(
+                      children: [
+                        isCountryReady
+                            ? DropdownButtonFormField<LocationModel>(
+                                focusColor: Colors.white,
+                                isExpanded: true,
+                                hint: const Text('Ülke'),
+                                value: countryValue,
+                                items: placeViewModel.countryNameList
+                                    .map((LocationModel value) {
+                                  return DropdownMenuItem<LocationModel>(
+                                    value: value,
+                                    child: Text(value.name),
+                                  );
+                                }).toList(),
+                                onChanged: (LocationModel? model) async {
+                                  if (model != null) {
+                                    isStateReady = false;
+                                    stateList = await placeViewModel
+                                        .loadTempStates(model.id);
+                                    countryValue = model;
+                                    stateValue = stateList.isNotEmpty
+                                        ? stateList.first
+                                        : null;
+
+                                    isStateReady = true;
+                                  }
+                                  setState(() {});
+                                },
+                              )
+                            : const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        isStateReady
+                            ? DropdownButtonFormField<LocationModel>(
+                                focusColor: Colors.white,
+                                isExpanded: true,
+                                value: stateValue,
+                                hint: const Text('Şehir'),
+                                items: stateList.map((LocationModel value) {
+                                  return DropdownMenuItem<LocationModel>(
+                                    value: value,
+                                    child: Text(value.name),
+                                  );
+                                }).toList(),
+                                onChanged: (model) {
+                                  stateValue = model;
+                                  setState(() {});
+                                },
+                              )
+                            : const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        ElevatedButton(
+                          onPressed:
+                              (countryValue != null && stateValue != null)
+                                  ? () {
+                                      placeViewModel.stateNameList = stateList;
+                                      placeViewModel.savePlace(
+                                          cityName: stateValue!,
+                                          countryName: countryValue!);
+                                      userViewModel.getSharingsbyLocation(
+                                          countryValue!.name, stateValue!.name);
+                                      if (userViewModel.user != null) {
+                                        userViewModel.updateUser(
+                                            userViewModel.user!.userID, {
+                                          'lastState': stateValue?.toMap(),
+                                          'lastCountry': countryValue?.toMap(),
+                                        });
+                                      }
+                                      Navigator.of(context).pop();
+                                    }
+                                  : null,
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: twitterBlue,
+                              shape: const StadiumBorder()),
+                          child: const Text(
+                            'Lokasyonu Değiştir',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ).separated(
+                      const SizedBox(
+                        height: 16,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: user != null
-                        ? Column(
-                            children: [
-                              ListTile(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => const ProfilePage(),
-                                    ));
-                                  },
-                                  iconColor: Colors.black,
-                                  tileColor: Theme.of(context).primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  leading: const Icon(Icons.person),
-                                  title: const Text(
-                                    'Profil Sayfası',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  )),
-                              ListTile(
-                                  onTap: () {
-                                    userViewModel.signOut();
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const LandingScreen()),
-                                        (Route<dynamic> route) => false);
-                                  },
-                                  iconColor: Colors.black,
-                                  tileColor: Theme.of(context).primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  leading: const Icon(Icons.logout),
-                                  title: const Text(
-                                    'Oturum Kapat',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ))
-                            ],
-                          ).separated(const SizedBox(
-                            height: 8,
-                          ))
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const LandingScreen()),
-                                        (Route<dynamic> route) => false);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                      shape: const StadiumBorder()),
-                                  child: const Text('Üye Ol'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: user != null
+                      ? Column(
+                          children: [
+                            ListTile(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => const ProfilePage(),
+                                  ));
+                                },
+                                iconColor: Colors.black,
+                                tileColor: Theme.of(context).primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const LandingScreen()),
-                                        (Route<dynamic> route) => false);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                      shape: const StadiumBorder()),
-                                  child: const Text('Oturum Aç'),
-                                )
-                              ]).separated(const SizedBox(
-                            width: 16,
-                          )),
-                  )
-                ]),
-              )
-            : const Center(
-                child: CircularProgressIndicator(),
-              ),
-      ),
+                                leading: const Icon(Icons.person),
+                                title: const Text(
+                                  'Profil Sayfası',
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                )),
+                            ListTile(
+                                onTap: () {
+                                  userViewModel.signOut();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LandingScreen()),
+                                      (Route<dynamic> route) => false);
+                                },
+                                iconColor: Colors.black,
+                                tileColor: Theme.of(context).primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                leading: const Icon(Icons.logout),
+                                title: const Text(
+                                  'Oturum Kapat',
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ))
+                          ],
+                        ).separated(const SizedBox(
+                          height: 8,
+                        ))
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LandingScreen()),
+                                      (Route<dynamic> route) => false);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    shape: const StadiumBorder()),
+                                child: const Text('Üye Ol'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LandingScreen()),
+                                      (Route<dynamic> route) => false);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    shape: const StadiumBorder()),
+                                child: const Text('Oturum Aç'),
+                              )
+                            ]).separated(const SizedBox(
+                          width: 16,
+                        )),
+                )
+              ]),
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }
