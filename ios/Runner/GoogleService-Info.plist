@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>634897055312-vsp5olhjdoin7ie9jici11p5i5lg8qdi.apps.googleusercontent.com</string>
+	<string>634897055312-eolca366hj4g08c3rpd5r0e06nro6l7c.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.634897055312-vsp5olhjdoin7ie9jici11p5i5lg8qdi</string>
+	<string>com.googleusercontent.apps.634897055312-eolca366hj4g08c3rpd5r0e06nro6l7c</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCKhAMG_JzJ0CxdQ6JdbiKuo8hLPbloBXI</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.citylover</string>
+	<string>com.project.GurbetBiz</string>
 	<key>PROJECT_ID</key>
 	<string>citylover-a0f89</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,14 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:634897055312:ios:bac878a21f173131801b55</string>
+	<string>1:634897055312:ios:c85d6677229920e5801b55</string>
+	<key>DATABASE_URL</key>
+	<string>https://citylover-a0f89-default-rtdb.firebaseio.com</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<true/>
 </dict>
 </plist>

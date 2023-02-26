@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "634897055312",
+    "firebase_url": "https://citylover-a0f89-default-rtdb.firebaseio.com",
     "project_id": "citylover-a0f89",
     "storage_bucket": "citylover-a0f89.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:634897055312:android:056a66127f40bb4e801b55",
+        "mobilesdk_app_id": "1:634897055312:android:aff77c34b97d72e2801b55",
         "android_client_info": {
-          "package_name": "com.example.citylover"
+          "package_name": "com.project.GurbetBiz"
         }
       },
       "oauth_client": [
@@ -29,6 +30,13 @@
             {
               "client_id": "634897055312-f6b427cv8kof8cqtqiqaktkf79ghsetq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "634897055312-b9g051lb3mujdem0ui5msu8le02q9lcv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cityloveradmin"
+              }
             }
           ]
         }
