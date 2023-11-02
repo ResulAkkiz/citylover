@@ -1,6 +1,8 @@
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_clipper.dart';
-import 'package:citylover/app_contants/custom_theme.dart';
+import 'package:citylover/app_contants/image_enums.dart';
+import 'package:citylover/app_contants/theme_colors.dart';
+import 'package:citylover/common_widgets/icon_elevated_button.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/landingpage/landing_page.dart';
@@ -69,7 +71,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.6,
+      width: MediaQuery.of(context).size.width * 0.8,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
             topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
@@ -77,59 +79,51 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       child: isUserReady
           ? SingleChildScrollView(
               child: Column(children: [
-                Stack(
-                  fit: StackFit.loose,
-                  alignment: AlignmentDirectional.centerStart,
-                  children: [
-                    ClipPath(
-                      clipper: MyCustomClipper(),
-                      child: Container(
-                        color: twitterBlue,
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.25,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Flex(
-                        direction: Axis.horizontal,
+                ClipPath(
+                  clipper: MyCustomClipper(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    color: ThemeColors.primary400,
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    child: InkWell(
+                      onTap: () {
+                        if (userViewModel.user != null) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ProfilePage(),
+                          ));
+                        }
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Flexible(
-                            flex: 2,
-                            child: InkWell(
-                              onTap: () {
-                                if (userViewModel.user != null) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const ProfilePage(),
-                                  ));
-                                }
-                              },
-                              child: CircleAvatar(
-                                radius: 32,
-                                backgroundImage: NetworkImage(user != null
-                                    ? user!.userProfilePict!
-                                    : 'https://w7.pngwing.com/pngs/980/304/png-transparent-computer-icons-user-profile-avatar-heroes-silhouette-avatar.png'),
-                              ),
-                            ),
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundImage: AssetImage(ImageEnum.user.toPath),
                           ),
-                          Flexible(
-                            flex: 5,
-                            child: Text(
+                          Chip(
+                            elevation: 4,
+                            backgroundColor: ThemeColors.primary300,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            label: Text(
+                              overflow: TextOverflow.ellipsis,
                               user != null
                                   ? '${user!.userName!} ${user!.userSurname!}'
                                   : 'Hoşgeldiniz',
+                              maxLines: 2,
                               style: const TextStyle(
                                   fontSize: 24,
-                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.8,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.white),
                             ),
                           )
                         ],
-                      ).separated(const SizedBox(
-                        width: 12,
-                      )),
+                      ),
                     ),
-                  ],
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -191,7 +185,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             : const Center(
                                 child: CircularProgressIndicator(),
                               ),
-                        ElevatedButton(
+                        IconElevatedButton(
+                          icon: const Icon(
+                            Icons.public,
+                            color: Colors.black,
+                          ),
                           onPressed:
                               (countryValue != null && stateValue != null)
                                   ? () {
@@ -211,13 +209,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                       Navigator.of(context).pop();
                                     }
                                   : null,
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: twitterBlue,
-                              shape: const StadiumBorder()),
-                          child: const Text(
-                            'Lokasyonu Değiştir',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          text: "Lokasyonu değiştir",
                         )
                       ],
                     ).separated(
@@ -239,15 +231,27 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                     builder: (context) => const ProfilePage(),
                                   ));
                                 },
-                                iconColor: Colors.black,
-                                tileColor: Theme.of(context).primaryColor,
+                                iconColor: Colors.white,
+                                tileColor: ThemeColors.primary400,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                leading: const Icon(Icons.person),
+                                leading: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                          color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(Icons.person)),
                                 title: const Text(
                                   'Profil Sayfası',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      letterSpacing: 0.8,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
                                 )),
                             ListTile(
                                 onTap: () {
@@ -258,15 +262,31 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                               const LandingScreen()),
                                       (Route<dynamic> route) => false);
                                 },
-                                iconColor: Colors.black,
-                                tileColor: Theme.of(context).primaryColor,
+                                iconColor: Colors.white,
+                                tileColor: ThemeColors.primary400,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                leading: const Icon(Icons.logout),
+                                leading: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                          color: Colors.white, width: 2),
+                                    ),
+                                    child: const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 3),
+                                      child: Icon(Icons.logout),
+                                    )),
                                 title: const Text(
                                   'Oturum Kapat',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      letterSpacing: 0.8,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
                                 ))
                           ],
                         ).separated(const SizedBox(

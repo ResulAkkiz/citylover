@@ -1,10 +1,12 @@
+import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:flutter/material.dart';
 
 Color twitterBlue = const Color(0xFF1DA1F2);
 
 final ThemeData customTheme = ThemeData(
+  fontFamily: "Poppins",
   brightness: Brightness.light,
-  primaryColor: const Color(0xffd3d3d3),
+  primaryColor: ThemeColors.primary500,
   primaryColorLight: const Color(0xffe6e6e6),
   primaryColorDark: const Color(0xff4d4d4d),
   canvasColor: const Color(0xfffafafa),
@@ -213,26 +215,26 @@ final ThemeData customTheme = ThemeData(
       fontStyle: FontStyle.normal,
     ),
   ),
-  inputDecorationTheme: const InputDecorationTheme(
-    labelStyle: TextStyle(
+  inputDecorationTheme: InputDecorationTheme(
+    labelStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    helperStyle: TextStyle(
+    helperStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    hintStyle: TextStyle(
+    hintStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    errorStyle: TextStyle(
+    errorStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
@@ -240,30 +242,30 @@ final ThemeData customTheme = ThemeData(
     ),
     errorMaxLines: null,
     isDense: false,
-    contentPadding: EdgeInsets.all(12),
+    contentPadding: const EdgeInsets.all(12),
     isCollapsed: false,
-    prefixStyle: TextStyle(
+    prefixStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    suffixStyle: TextStyle(
+    suffixStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    counterStyle: TextStyle(
+    counterStyle: const TextStyle(
       color: Color(0xdd000000),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    filled: false,
-    fillColor: Color(0x00000000),
+    filled: true,
+    fillColor: ThemeColors.background100,
     floatingLabelBehavior: FloatingLabelBehavior.auto,
-    errorBorder: OutlineInputBorder(
+    errorBorder: const OutlineInputBorder(
       borderSide: BorderSide(
         color: Colors.red,
         width: 1,
@@ -273,13 +275,13 @@ final ThemeData customTheme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(
-        color: Color(0xff000000),
-        width: 1.3,
+        color: ThemeColors.primary500,
+        width: 1.8,
         style: BorderStyle.solid,
       ),
-      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
     ),
-    focusedErrorBorder: OutlineInputBorder(
+    focusedErrorBorder: const OutlineInputBorder(
       borderSide: BorderSide(
         color: Colors.red,
         width: 1.3,
@@ -289,21 +291,21 @@ final ThemeData customTheme = ThemeData(
     ),
     disabledBorder: OutlineInputBorder(
       borderSide: BorderSide(
-        color: Color(0xff000000),
+        color: ThemeColors.textGrey400,
         width: 1.3,
         style: BorderStyle.solid,
       ),
-      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
     ),
     enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(
-        color: Color(0xff000000),
+        color: ThemeColors.primary300,
         width: 1.3,
         style: BorderStyle.solid,
       ),
-      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
     ),
-    border: OutlineInputBorder(
+    border: const OutlineInputBorder(
       borderSide: BorderSide(
         color: Color(0xff000000),
         width: 1.3,

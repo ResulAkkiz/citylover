@@ -1,5 +1,6 @@
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_theme.dart';
+import 'package:citylover/app_contants/image_enums.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
@@ -68,9 +69,8 @@ class _AddSharingPageState extends State<AddSharingPage> {
                         children: [
                           CircleAvatar(
                               radius: 32,
-                              backgroundImage: NetworkImage(user != null
-                                  ? user!.userProfilePict!
-                                  : 'https://w7.pngwing.com/pngs/980/304/png-transparent-computer-icons-user-profile-avatar-heroes-silhouette-avatar.png')),
+                              backgroundImage:
+                                  AssetImage(ImageEnum.user.toPath)),
                           const SizedBox(
                             width: 12,
                           ),
