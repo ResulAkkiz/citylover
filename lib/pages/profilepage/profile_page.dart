@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:citylover/app_contants/app_extensions.dart';
-import 'package:citylover/app_contants/string_generator.dart';
+import 'package:citylover/app_contants/image_enums.dart';
+import 'package:citylover/app_contants/image_utils.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
@@ -45,7 +46,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _kameradanCek() async {
-    var yeniResim = await imagePicker.pickImage(source: ImageSource.camera);
+    var yeniResim = await imagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 20);
+
     setState(() {
       if (yeniResim != null) {
         userPhoto = (File(yeniResim.path));
@@ -55,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _galeridenSec() async {
     var yeniResim = await imagePicker.pickImage(source: ImageSource.gallery);
+
     setState(() {
       if (yeniResim != null) {
         userPhoto = (File(yeniResim.path));
@@ -304,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   },
                                   leading: CircleAvatar(
                                     backgroundImage:
-                                        NetworkImage(user!.userProfilePict!),
+                                        AssetImage(ImageEnum.user.toPath),
                                   ),
                                   title: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -389,9 +393,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<String?> uploadProfilePhoto() async {
     UserViewModel userViewModel =
         Provider.of<UserViewModel>(context, listen: false);
-    if (userPhoto != null) {
+    if (userPhoto != null && user != null) {
+      File blurImageFile = await ImageUtils.processImage(userPhoto!);
+      await userViewModel.uploadFile(user!.userID, "thumbnail", blurImageFile);
       return await userViewModel.uploadFile(
-          getRandomString(12), 'profilephoto', userPhoto!);
+          user!.userID, 'profilephoto', userPhoto!);
     } else {
       return user?.userProfilePict;
     }

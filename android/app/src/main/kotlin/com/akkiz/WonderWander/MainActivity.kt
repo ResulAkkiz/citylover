@@ -1,4 +1,4 @@
-package com.project.GurbetBiz
+package com.akkiz.WonderWander
 
 import io.flutter.embedding.android.FlutterActivity
 
