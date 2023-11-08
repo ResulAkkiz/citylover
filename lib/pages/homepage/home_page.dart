@@ -1,5 +1,4 @@
 import 'package:citylover/app_contants/app_extensions.dart';
-import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/app_contants/image_enums.dart';
 import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
@@ -69,65 +68,22 @@ class _HomePageState extends State<HomePage> {
             false;
       }, // kullanıcı
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         floatingActionButton: Visibility(
           visible: userViewModel.user != null,
-          child: FloatingActionButton(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0)),
-            backgroundColor: twitterBlue,
-            child: const Icon(
-              Icons.add_rounded,
-              size: 48,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const AddSharingPage(),
-              ));
-            },
-          ),
+          child: const FloatingActionButton(),
         ),
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: Container(
             padding: const EdgeInsets.only(left: 12),
-            color: Colors.white,
             child: SafeArea(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const DrawerButton(),
-                  Container(
-                    padding: const EdgeInsets.only(left: 36, right: 24),
-                    constraints: BoxConstraints(
-                      minHeight: kToolbarHeight,
-                      minWidth: MediaQuery.sizeOf(context).width * 0.50,
-                      maxWidth: MediaQuery.sizeOf(context).width * 0.70,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ThemeColors.primary400,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.elliptical(50, 50),
-                      ),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Text(
-                        '${placeViewModel.country?.name} / ${placeViewModel.city?.name}',
-                        style: TextStyle(
-                            shadows: [
-                              BoxShadow(
-                                  color: ThemeColors.textGrey400,
-                                  offset: const Offset(1, 1))
-                            ],
-                            letterSpacing: 0.8,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-                    ),
-                  )
+                  LocationTitleWidget(placeViewModel: placeViewModel)
                 ],
               ),
             ),
@@ -143,6 +99,7 @@ class _HomePageState extends State<HomePage> {
                 child: SafeArea(
                   child: Center(
                     child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.all(12.0),
                       itemBuilder: (context, index) {
                         SharingModel currentSharing =
@@ -160,12 +117,15 @@ class _HomePageState extends State<HomePage> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 20),
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 20),
+                                      margin: const EdgeInsets.only(
+                                          bottom: 20, top: 10),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          color: Colors.white,
+                                          borderRadius: const BorderRadius.only(
+                                              bottomRight:
+                                                  Radius.elliptical(25, 25),
+                                              topLeft:
+                                                  Radius.elliptical(25, 25)),
+                                          color: ThemeColors.background200,
                                           boxShadow: [
                                             BoxShadow(
                                                 blurRadius: 2,
@@ -424,6 +384,69 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+class FloatingActionButton extends StatelessWidget {
+  const FloatingActionButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      constraints: const BoxConstraints(minHeight: 90, minWidth: 90),
+      padding: EdgeInsets.zero,
+      icon: Image.asset(
+        ImageEnum.paper.toPath,
+      ),
+      onPressed: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const AddSharingPage(),
+        ));
+      },
+    );
+  }
+}
+
+class LocationTitleWidget extends StatelessWidget {
+  const LocationTitleWidget({
+    super.key,
+    required this.placeViewModel,
+  });
+
+  final PlaceViewModel placeViewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(left: 36, right: 24),
+      constraints: BoxConstraints(
+        minHeight: kToolbarHeight,
+        minWidth: MediaQuery.sizeOf(context).width * 0.50,
+        maxWidth: MediaQuery.sizeOf(context).width * 0.70,
+      ),
+      decoration: BoxDecoration(
+        color: ThemeColors.primary400,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.elliptical(50, 50),
+        ),
+      ),
+      child: FittedBox(
+        fit: BoxFit.fitWidth,
+        child: Text(
+          '${placeViewModel.country?.name} / ${placeViewModel.city?.name}',
+          style: TextStyle(
+              shadows: [
+                BoxShadow(
+                    color: ThemeColors.textGrey400, offset: const Offset(1, 1))
+              ],
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w500,
+              color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
 class SharingDateWidget extends StatelessWidget {
   const SharingDateWidget({
     super.key,
@@ -458,37 +481,37 @@ class SharingImageWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(4.0),
           child: Image.network(
             "https://firebasestorage.googleapis.com/v0/b/wonderwander-d7833.appspot.com/o/sharingPics%2Fthumbnail%2FProfile_photo.png?alt=media&token=b91286f8-d04d-4fe4-af8c-7c9415f7dbde&_gl=1*19d1hps*_ga*MzUyODUzOTM0LjE2OTA2MjY5MjM.*_ga_CW55HF8NVT*MTY5ODk5Nzk1MC41Ni4xLjE2OTg5OTc5NTIuNTguMC4w",
-            width: 40,
-            height: 40,
+            width: 35,
+            height: 35,
           ),
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(4.0),
           child: Image.network(
             "https://firebasestorage.googleapis.com/v0/b/wonderwander-d7833.appspot.com/o/sharingPics%2Fthumbnail%2FProfile_photo.png?alt=media&token=b91286f8-d04d-4fe4-af8c-7c9415f7dbde&_gl=1*19d1hps*_ga*MzUyODUzOTM0LjE2OTA2MjY5MjM.*_ga_CW55HF8NVT*MTY5ODk5Nzk1MC41Ni4xLjE2OTg5OTc5NTIuNTguMC4w",
-            width: 40,
-            height: 40,
+            width: 35,
+            height: 35,
           ),
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(4.0),
           child: Image.network(
             "https://firebasestorage.googleapis.com/v0/b/wonderwander-d7833.appspot.com/o/sharingPics%2Fthumbnail%2FProfile_photo.png?alt=media&token=b91286f8-d04d-4fe4-af8c-7c9415f7dbde&_gl=1*19d1hps*_ga*MzUyODUzOTM0LjE2OTA2MjY5MjM.*_ga_CW55HF8NVT*MTY5ODk5Nzk1MC41Ni4xLjE2OTg5OTc5NTIuNTguMC4w",
-            width: 40,
-            height: 40,
+            width: 35,
+            height: 35,
           ),
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(4.0),
           child: Image.network(
             "https://firebasestorage.googleapis.com/v0/b/wonderwander-d7833.appspot.com/o/sharingPics%2Fthumbnail%2FProfile_photo.png?alt=media&token=b91286f8-d04d-4fe4-af8c-7c9415f7dbde&_gl=1*19d1hps*_ga*MzUyODUzOTM0LjE2OTA2MjY5MjM.*_ga_CW55HF8NVT*MTY5ODk5Nzk1MC41Ni4xLjE2OTg5OTc5NTIuNTguMC4w",
-            width: 40,
-            height: 40,
+            width: 35,
+            height: 35,
           ),
         ),
         Container(
-          width: 40,
-          height: 40,
+          width: 35,
+          height: 35,
           decoration: BoxDecoration(
             color: ThemeColors.textGrey200,
             borderRadius: BorderRadius.circular(4.0),

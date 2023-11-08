@@ -11,7 +11,7 @@ class CustomBackButton extends StatelessWidget {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
           elevation: 8,
-          backgroundColor: ThemeColors.primary300,
+          backgroundColor: ThemeColors.primary400,
           shape: const StadiumBorder()),
       onPressed: () {
         Navigator.maybePop(context);

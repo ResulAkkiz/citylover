@@ -10,7 +10,8 @@ enum ImageEnum {
   pencil,
   user,
   enter,
-  signin
+  signin,
+  paper
 }
 
 extension ImageEnumExtension on ImageEnum {

@@ -1,10 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:citylover/app_contants/app_extensions.dart';
+import 'package:citylover/app_contants/image_enums.dart';
 import 'package:citylover/app_contants/string_generator.dart';
+import 'package:citylover/app_contants/theme_colors.dart';
+import 'package:citylover/common_widgets/custom_back_button.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
+import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/pages/profilepage/other_profile_page.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +48,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       bottomNavigationBar: Visibility(
         visible: userViewModel.user != null,
@@ -51,218 +56,410 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
           sharingModel: sharingModel,
         ),
       ),
-      appBar: AppBar(
-        title: const Text(
-          'Paylaşım',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          padding: const EdgeInsets.only(left: 12),
+          color: Colors.transparent,
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomBackButton(),
+                Container(
+                  alignment: Alignment.center,
+                  constraints: BoxConstraints(
+                    minHeight: kToolbarHeight,
+                    minWidth: MediaQuery.sizeOf(context).width * 0.50,
+                    maxWidth: MediaQuery.sizeOf(context).width * 0.70,
+                  ),
+                  decoration: BoxDecoration(
+                      color: ThemeColors.primary400,
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.elliptical(50, 50))),
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      '${sharingModel.cityName} / ${sharingModel.countryName}',
+                      style: TextStyle(
+                          shadows: [
+                            BoxShadow(
+                                color: ThemeColors.textGrey400,
+                                offset: const Offset(1, 1))
+                          ],
+                          letterSpacing: 0.8,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InkWell(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      OtherUserProfilePage(userID: userModel.userID),
-                ));
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundImage: NetworkImage(userModel.userProfilePict!),
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${userModel.userName} ${userModel.userSurname}',
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        '${sharingModel.countryName} / ${sharingModel.cityName}', //'$country / $province',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black.withOpacity(0.6)),
-                      ),
-                    ],
-                  ),
-                ],
+      body: Padding(
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).viewPadding.top), //Status bar height
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              const SizedBox.square(
+                dimension: kToolbarHeight - 10,
               ),
-            ),
-            Text(
-              sharingModel.sharingContent,
-              style: const TextStyle(fontSize: 16),
-            ),
-            Text(
-              DateFormat('HH:mm•dd/MM/yyyy').format(sharingModel.sharingDate),
-            ),
-            const Divider(thickness: 1.2),
-            isCommentsReady
-                ? ListView.separated(
-                    reverse: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      CommentModel currentComment =
-                          userViewModel.commentList[index];
-                      return FutureBuilder(
-                          future: userViewModel.readUser(currentComment.userID),
-                          builder:
-                              (context, AsyncSnapshot<UserModel?> snapshot) {
-                            if (snapshot.hasData) {
-                              var currentUser = snapshot.data;
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      currentUser!.userProfilePict!),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.elliptical(25, 25),
+                        topLeft: Radius.elliptical(25, 25)),
+                    color: ThemeColors.background200,
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 2,
+                          color: ThemeColors.background400,
+                          offset: const Offset(2, 2))
+                    ],
+                    border:
+                        Border.all(width: 2, color: ThemeColors.background500)),
+                child: Flex(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  direction: Axis.horizontal,
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => OtherUserProfilePage(
+                                    userID: userModel.userID),
+                              ));
+                            },
+                            child: CircleAvatar(
+                              radius: 36,
+                              backgroundImage:
+                                  AssetImage(ImageEnum.user.toPath),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "${userModel.userName!} ${userModel.userSurname!}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '${currentUser.userName} ${currentUser.userSurname}',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Builder(
-                                          builder: (context) {
-                                            if (userViewModel.user != null) {
-                                              if (currentComment.userID !=
-                                                  userViewModel.user!.userID) {
-                                                return IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () async {
-                                                    bool response =
-                                                        await buildShowDialog(
-                                                                context,
-                                                                const Text(
-                                                                    'Uyarı'),
-                                                                const Text(
-                                                                    'Seçmiş olduğunuz yorumu, raporlamak istediğinizden emin misiniz ?')) ??
-                                                            false;
-
-                                                    if (response) {
-                                                      bool isSuccessful =
-                                                          await userViewModel
-                                                              .reportComment(
-                                                                  currentComment);
-                                                      if (isSuccessful &&
-                                                          mounted) {
-                                                        buildShowModelBottomSheet(
-                                                            context,
-                                                            'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
-                                                            Icons
-                                                                .done_outlined);
-                                                      }
-                                                    }
-                                                  },
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .report_problem_outlined,
-                                                    size: 14,
-                                                  ),
-                                                );
-                                              } else {
-                                                return IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  onPressed: () async {
-                                                    bool response =
-                                                        await buildShowDialog(
-                                                                context,
-                                                                const Text(
-                                                                    'Uyarı'),
-                                                                const Text(
-                                                                    'Seçmiş olduğunuz yorumu, silmek istediğinizden emin misiniz ?')) ??
-                                                            false;
-
-                                                    if (response) {
-                                                      bool isSuccesful =
-                                                          await userViewModel
-                                                              .deleteComment(
-                                                                  currentComment
-                                                                      .sharingID,
-                                                                  currentComment
-                                                                      .commentID);
-                                                      if (isSuccesful &&
-                                                          mounted) {
-                                                        buildShowModelBottomSheet(
-                                                            context,
-                                                            'Yorum silme işlemi başarıyla gerçekleşti.',
-                                                            Icons.check);
-                                                      }
-                                                    }
-                                                  },
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  icon: const Icon(
-                                                    Icons.clear,
-                                                    size: 14,
-                                                  ),
-                                                );
-                                              }
-                                            } else {
-                                              return const SizedBox();
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      currentComment.commentContent,
-                                      style: const TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Text(
-                                      DateFormat('HH:mm•dd/MM/yyyy')
-                                          .format(currentComment.commentDate),
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ],
-                                ).separated(
-                                  const SizedBox(
-                                    height: 4,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            sharingModel.sharingContent,
+                            style: TextStyle(
+                              color: ThemeColors.textGrey400,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SharingDateWidget(currentSharing: sharingModel),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.comment,
+                                    size: 16,
                                   ),
-                                ),
-                              );
-                            } else {
-                              return const CircularProgressIndicator();
-                            }
-                          });
-                    },
-                    itemCount: userViewModel.commentList.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const Divider(thickness: 1.2);
-                    },
-                  )
-                : const Center(
-                    child: CircularProgressIndicator(),
-                  )
-          ],
-        ).separated(
-          const SizedBox(
-            height: 8,
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  FutureBuilder(
+                                      future: userViewModel.getCommentsList(
+                                          sharingModel.sharingID),
+                                      builder:
+                                          (context, AsyncSnapshot snapshot) {
+                                        if (snapshot.hasData) {
+                                          List<CommentModel> commentList =
+                                              snapshot.data;
+                                          int listLength = commentList.length;
+                                          return Text(
+                                            listLength.toString(),
+                                            style: const TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 12,
+                                            ),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                              child: Text(
+                                                  snapshot.error.toString()));
+                                        } else {
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                      }),
+                                  Builder(
+                                    builder: (context) {
+                                      if (userViewModel.user != null) {
+                                        if (sharingModel.userID !=
+                                            userViewModel.user!.userID) {
+                                          return IconButton(
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () async {
+                                              bool response = await buildShowDialog(
+                                                      context,
+                                                      const Text('Uyarı'),
+                                                      const Text(
+                                                          'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
+                                                  false;
+                                              if (response) {
+                                                bool isSuccessful =
+                                                    await userViewModel
+                                                        .reportSharing(
+                                                            sharingModel);
+                                                debugPrint(
+                                                    isSuccessful.toString());
+                                                if (isSuccessful && mounted) {
+                                                  buildShowModelBottomSheet(
+                                                      context,
+                                                      'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
+                                                      Icons.report_problem);
+                                                }
+                                              }
+                                            },
+                                            constraints: const BoxConstraints(),
+                                            icon: const Icon(
+                                              Icons.report_problem_outlined,
+                                              size: 14,
+                                            ),
+                                          );
+                                        } else {
+                                          return IconButton(
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () async {
+                                              bool response = await buildShowDialog(
+                                                      context,
+                                                      const Text('Uyarı'),
+                                                      const Text(
+                                                          'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
+                                                  false;
+
+                                              if (response) {
+                                                bool isSuccesful =
+                                                    await userViewModel
+                                                        .deleteSharing(
+                                                            sharingModel);
+                                                if (isSuccesful && mounted) {
+                                                  buildShowModelBottomSheet(
+                                                      context,
+                                                      'Paylaşım silme işlemi başarıyla gerçekleşti.',
+                                                      Icons.check);
+                                                }
+                                              }
+                                            },
+                                            constraints: const BoxConstraints(),
+                                            icon: const Icon(
+                                              Icons.clear,
+                                              size: 14,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    },
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SharingImageWidget()
+                        ],
+                      ).separated(const SizedBox(
+                        height: 8,
+                      )),
+                    ),
+                    const Flexible(flex: 1, child: DetailRateButtonsWidget()),
+                  ],
+                ),
+              ),
+              const Divider(thickness: 1.2),
+              isCommentsReady
+                  ? ListView.separated(
+                      padding: EdgeInsets.zero,
+                      reverse: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        CommentModel currentComment =
+                            userViewModel.commentList[index];
+                        return FutureBuilder(
+                            future:
+                                userViewModel.readUser(currentComment.userID),
+                            builder:
+                                (context, AsyncSnapshot<UserModel?> snapshot) {
+                              if (snapshot.hasData) {
+                                var currentUser = snapshot.data;
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                        currentUser!.userProfilePict!),
+                                  ),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '${currentUser.userName} ${currentUser.userSurname}',
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Builder(
+                                            builder: (context) {
+                                              if (userViewModel.user != null) {
+                                                if (currentComment.userID !=
+                                                    userViewModel
+                                                        .user!.userID) {
+                                                  return IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    onPressed: () async {
+                                                      bool response =
+                                                          await buildShowDialog(
+                                                                  context,
+                                                                  const Text(
+                                                                      'Uyarı'),
+                                                                  const Text(
+                                                                      'Seçmiş olduğunuz yorumu, raporlamak istediğinizden emin misiniz ?')) ??
+                                                              false;
+
+                                                      if (response) {
+                                                        bool isSuccessful =
+                                                            await userViewModel
+                                                                .reportComment(
+                                                                    currentComment);
+                                                        if (isSuccessful &&
+                                                            mounted) {
+                                                          buildShowModelBottomSheet(
+                                                              context,
+                                                              'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
+                                                              Icons
+                                                                  .done_outlined);
+                                                        }
+                                                      }
+                                                    },
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .report_problem_outlined,
+                                                      size: 14,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    onPressed: () async {
+                                                      bool response =
+                                                          await buildShowDialog(
+                                                                  context,
+                                                                  const Text(
+                                                                      'Uyarı'),
+                                                                  const Text(
+                                                                      'Seçmiş olduğunuz yorumu, silmek istediğinizden emin misiniz ?')) ??
+                                                              false;
+
+                                                      if (response) {
+                                                        bool isSuccesful =
+                                                            await userViewModel
+                                                                .deleteComment(
+                                                                    currentComment
+                                                                        .sharingID,
+                                                                    currentComment
+                                                                        .commentID);
+                                                        if (isSuccesful &&
+                                                            mounted) {
+                                                          buildShowModelBottomSheet(
+                                                              context,
+                                                              'Yorum silme işlemi başarıyla gerçekleşti.',
+                                                              Icons.check);
+                                                        }
+                                                      }
+                                                    },
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    icon: const Icon(
+                                                      Icons.clear,
+                                                      size: 14,
+                                                    ),
+                                                  );
+                                                }
+                                              } else {
+                                                return const SizedBox();
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        currentComment.commentContent,
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Text(
+                                        DateFormat('HH:mm•dd/MM/yyyy')
+                                            .format(currentComment.commentDate),
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ).separated(
+                                    const SizedBox(
+                                      height: 4,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return const CircularProgressIndicator();
+                              }
+                            });
+                      },
+                      itemCount: userViewModel.commentList.length,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(thickness: 1.2);
+                      },
+                    )
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    )
+            ],
+          ).separated(
+            const SizedBox(
+              height: 8,
+            ),
           ),
         ),
       ),
@@ -332,101 +529,57 @@ class _CommentBoxState extends State<CommentBox> {
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
     return Padding(
-      padding: MediaQuery.of(context).viewInsets,
-      child: Material(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            right: 8.0,
-            left: 8.0,
-            bottom: 2.0,
+      padding: const EdgeInsets.all(8.0),
+      child: Flex(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        direction: Axis.horizontal,
+        children: [
+          Flexible(
+            flex: 8,
+            child: TextFormField(
+              decoration: InputDecoration(
+                  hintText: "Yorum yaz..",
+                  hintStyle: TextStyle(color: ThemeColors.textGrey300)),
+              controller: commentController,
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ),
-          child: Flex(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            direction: Axis.horizontal,
-            children: [
-              Flexible(
-                flex: 8,
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                  child: TextField(
-                    maxLength: 350,
-                    buildCounter: (context,
-                        {required currentLength,
-                        required isFocused,
-                        maxLength}) {
-                      return Builder(builder: (context) {
-                        Color color;
-                        if (maxLength! - currentLength < 20 &&
-                            maxLength - currentLength != 0) {
-                          color = Colors.amber;
-                        } else if (maxLength - currentLength == 0) {
-                          color = Colors.red;
-                        } else {
-                          color = Colors.black54;
-                        }
-                        return Text(
-                          '$currentLength / $maxLength',
-                          style: TextStyle(color: color),
-                        );
-                      });
-                    },
-                    controller: commentController,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(bottom: 0, left: 4),
-                      hintText: 'Yorumunu Paylaş',
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 1, color: Colors.black),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(width: 1, color: Colors.black),
-                      ),
-                    ),
+          Flexible(
+              flex: 1,
+              child: Builder(builder: (context) {
+                return IgnorePointer(
+                  ignoring: iconIgnore,
+                  child: IconButton(
+                    color: Colors.amber,
+                    icon: const Icon(Icons.arrow_forward_ios_outlined),
+                    onPressed: commentController.text.trim() != ''
+                        ? () async {
+                            iconIgnore = true;
+                            setState(() {});
+                            debugPrint(iconIgnore.toString());
+                            bool isSuccessful = await userViewModel.addComment(
+                              CommentModel(
+                                  status: true,
+                                  commentID: getRandomString(15),
+                                  sharingID: sharingModel.sharingID,
+                                  userID: user!.userID,
+                                  commentDate: DateTime.now(),
+                                  commentContent: commentController.text),
+                            );
+                            if (isSuccessful && mounted) {
+                              buildShowModelBottomSheet(context,
+                                  'Yorumunuz yayınlandı.', Icons.done_outlined);
+                              commentController.clear();
+                            }
+                            iconIgnore = false;
+                          }
+                        : null,
                   ),
-                ),
-              ),
-              Flexible(
-                  flex: 1,
-                  child: Builder(builder: (context) {
-                    return IgnorePointer(
-                      ignoring: iconIgnore,
-                      child: IconButton(
-                        color: Colors.amber,
-                        icon: const Icon(Icons.arrow_forward_ios_outlined),
-                        onPressed: commentController.text.trim() != ''
-                            ? () async {
-                                iconIgnore = true;
-                                setState(() {});
-                                debugPrint(iconIgnore.toString());
-                                bool isSuccessful =
-                                    await userViewModel.addComment(
-                                  CommentModel(
-                                      status: true,
-                                      commentID: getRandomString(15),
-                                      sharingID: sharingModel.sharingID,
-                                      userID: user!.userID,
-                                      commentDate: DateTime.now(),
-                                      commentContent: commentController.text),
-                                );
-                                if (isSuccessful && mounted) {
-                                  buildShowModelBottomSheet(
-                                      context,
-                                      'Yorumunuz yayınlandı.',
-                                      Icons.done_outlined);
-                                  commentController.clear();
-                                }
-                                iconIgnore = false;
-                              }
-                            : null,
-                      ),
-                    );
-                  }))
-            ],
-          ),
-        ),
+                );
+              }))
+        ],
       ),
     );
   }
@@ -441,6 +594,79 @@ class _CommentBoxState extends State<CommentBox> {
   }
 }
 
+class DetailRateButtonsWidget extends StatelessWidget {
+  const DetailRateButtonsWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.0),
+                border: Border.all(color: ThemeColors.primary200),
+                color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.expand_less_rounded,
+                  color: ThemeColors.primary200,
+                ),
+                FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    '1453',
+                    softWrap: false,
+                    style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                        color: ThemeColors.primary200),
+                  ),
+                )
+              ],
+            )),
+        const SizedBox(
+          height: 12,
+        ),
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4.0),
+              border: Border.all(color: Colors.red.shade200),
+              color: Colors.white),
+          child: Column(
+            children: [
+              Icon(
+                Icons.expand_more_rounded,
+                color: Colors.red.shade200,
+              ),
+              FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  '763',
+                  softWrap: false,
+                  style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.red.shade200),
+                ),
+              )
+            ],
+          ),
+        ),
+        const SizedBox(
+          width: 12,
+        ),
+      ],
+    );
+  }
+}
 
 
 
