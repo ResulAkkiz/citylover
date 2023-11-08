@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/image_enums.dart';
-import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:citylover/common_widgets/custom_back_button.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
@@ -49,10 +48,13 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      extendBody: false,
       backgroundColor: Colors.white,
-      bottomNavigationBar: Visibility(
+      resizeToAvoidBottomInset: true,
+      bottomSheet: Visibility(
         visible: userViewModel.user != null,
         child: CommentBox(
+          user: userModel,
           sharingModel: sharingModel,
         ),
       ),
@@ -496,11 +498,9 @@ Future<bool?> buildShowDialog(
 }
 
 class CommentBox extends StatefulWidget {
-  const CommentBox({
-    super.key,
-    required this.sharingModel,
-  });
+  const CommentBox({super.key, required this.sharingModel, required this.user});
   final SharingModel sharingModel;
+  final UserModel user;
 
   @override
   State<CommentBox> createState() => _CommentBoxState();
@@ -508,89 +508,221 @@ class CommentBox extends StatefulWidget {
 
 class _CommentBoxState extends State<CommentBox> {
   late SharingModel sharingModel;
-  bool iconIgnore = false;
-  UserModel? user;
-  bool isUserReady = false;
+  late UserModel user;
+
+  final FocusNode _focusNode = FocusNode();
+  bool _isFocused = false;
+
   @override
   void initState() {
+    user = widget.user;
     sharingModel = widget.sharingModel;
+    _focusNode.addListener(() {
+      print("Tetiklendi");
+      _isFocused = _focusNode.hasFocus;
+    });
+
     super.initState();
   }
 
   @override
-  void didChangeDependencies() {
-    getUser();
-    super.didChangeDependencies();
+  Widget build(BuildContext context) {
+    print("build oldu");
+
+    return _isFocused
+        ? FocusedCommentBox(
+            focusNode: _focusNode,
+            sharing: sharingModel,
+            user: user,
+          )
+        : NotFocusedCommentBox(
+            user: user,
+            focusNode: _focusNode,
+          );
   }
 
-  TextEditingController commentController = TextEditingController();
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+}
+
+class FocusedCommentBox extends StatefulWidget {
+  const FocusedCommentBox(
+      {super.key,
+      required this.sharing,
+      required this.user,
+      required this.focusNode});
+
+  final UserModel user;
+  final SharingModel sharing;
+  final FocusNode focusNode;
+
+  @override
+  State<FocusedCommentBox> createState() => _FocusedCommentBoxState();
+}
+
+class _FocusedCommentBoxState extends State<FocusedCommentBox> {
+  late UserModel user;
+  late SharingModel sharing;
+  late FocusNode focusNode;
+  String? commentBoxText;
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+    sharing = widget.sharing;
+    focusNode = widget.focusNode;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Flex(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        direction: Axis.horizontal,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(
-            flex: 8,
-            child: TextFormField(
-              decoration: InputDecoration(
-                  hintText: "Yorum yaz..",
-                  hintStyle: TextStyle(color: ThemeColors.textGrey300)),
-              controller: commentController,
-              onChanged: (value) {
-                setState(() {});
-              },
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundImage:
+                    NetworkImage(user.userProfilePict ?? ImageEnum.user.toPath),
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              Text(
+                '${user.userName!} ${user.userSurname!}',
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              )
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: [
+                Text(
+                  '@${sharing.userID.substring(0, 6)}',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: ThemeColors.primary400),
+                ),
+                Text(
+                  ' kullanicisina yanıt olarak',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: ThemeColors.textGrey300),
+                ),
+              ],
             ),
           ),
-          Flexible(
-              flex: 1,
-              child: Builder(builder: (context) {
-                return IgnorePointer(
-                  ignoring: iconIgnore,
-                  child: IconButton(
-                    color: Colors.amber,
-                    icon: const Icon(Icons.arrow_forward_ios_outlined),
-                    onPressed: commentController.text.trim() != ''
-                        ? () async {
-                            iconIgnore = true;
-                            setState(() {});
-                            debugPrint(iconIgnore.toString());
-                            bool isSuccessful = await userViewModel.addComment(
-                              CommentModel(
-                                  status: true,
-                                  commentID: getRandomString(15),
-                                  sharingID: sharingModel.sharingID,
-                                  userID: user!.userID,
-                                  commentDate: DateTime.now(),
-                                  commentContent: commentController.text),
-                            );
-                            if (isSuccessful && mounted) {
-                              buildShowModelBottomSheet(context,
-                                  'Yorumunuz yayınlandı.', Icons.done_outlined);
-                              commentController.clear();
-                            }
-                            iconIgnore = false;
-                          }
-                        : null,
-                  ),
-                );
-              }))
+          TextFormField(
+            focusNode: focusNode,
+            decoration: InputDecoration(
+                hintText: "Yanıtını gönder",
+                hintStyle: TextStyle(color: ThemeColors.textGrey300)),
+            onChanged: (value) {
+              setState(() {
+                commentBoxText = value;
+              });
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () {},
+                icon: const Icon(Icons.image),
+                color: ThemeColors.primary300,
+              ),
+              ElevatedButton(
+                onPressed: commentBoxText == null || commentBoxText!.isEmpty
+                    ? null
+                    : () {
+                        //  bool isSuccessful = await userViewModel.addComment(
+                        //         CommentModel(
+                        //             status: true,
+                        //             commentID: getRandomString(15),
+                        //             sharingID: sharingModel.sharingID,
+                        //             userID: user!.userID,
+                        //             commentDate: DateTime.now(),
+                        //             commentContent: commentController.text),
+                        //       );
+                        //       if (isSuccessful && mounted) {
+                        //         buildShowModelBottomSheet(context,
+                        //             'Yorumunuz yayınlandı.', Icons.done_outlined);
+                        //         commentController.clear();
+                        //       }
+                      },
+                style: ElevatedButton.styleFrom(
+                    shape: const StadiumBorder(),
+                    backgroundColor: ThemeColors.primary400),
+                child: const Text(
+                  "Yanıtla",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600, color: Colors.white),
+                ),
+              )
+            ],
+          )
         ],
       ),
     );
   }
+}
 
-  Future<void> getUser() async {
-    final userViewModel = Provider.of<UserViewModel>(context);
-    if (userViewModel.user != null) {
-      user = await userViewModel.readUser(userViewModel.user!.userID);
-    }
-    isUserReady = true;
-    setState(() {});
+class NotFocusedCommentBox extends StatelessWidget {
+  const NotFocusedCommentBox({
+    super.key,
+    required this.user,
+    required FocusNode focusNode,
+  }) : _focusNode = focusNode;
+
+  final UserModel? user;
+  final FocusNode _focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flex(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            direction: Axis.horizontal,
+            children: [
+              Flexible(
+                flex: 1,
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      user!.userProfilePict ?? ImageEnum.user.toPath),
+                ),
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              Flexible(
+                flex: 8,
+                child: TextFormField(
+                  focusNode: _focusNode,
+                  decoration: InputDecoration(
+                      hintText: "Yorum yaz..",
+                      hintStyle: TextStyle(color: ThemeColors.textGrey300)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -667,52 +799,3 @@ class DetailRateButtonsWidget extends StatelessWidget {
     );
   }
 }
-
-
-
-// FutureBuilder(
-//                           future: userViewModel.readUser(currentComment.userID),
-//                           builder:
-//                               (context, AsyncSnapshot<UserModel?> snapshot) {
-//                             if (snapshot.hasData) {
-//                               var currentUser = snapshot.data;
-//                               return ListTile(
-//                                 leading: CircleAvatar(
-//                                   backgroundImage: NetworkImage(
-//                                       currentUser!.userProfilePict!),
-//                                 ),
-//                                 title: Column(
-//                                   crossAxisAlignment: CrossAxisAlignment.start,
-//                                   children: [
-//                                     Text(
-//                                       '${currentUser.userName} ${currentUser.userSurname} ',
-//                                       style: const TextStyle(
-//                                           fontSize: 12,
-//                                           fontWeight: FontWeight.w500),
-//                                     ),
-//                                     Text(
-//                                       currentComment.commentContent,
-//                                       style: const TextStyle(
-//                                         color: Colors.black54,
-//                                         fontSize: 12,
-//                                       ),
-//                                     ),
-//                                     Text(
-//                                       DateFormat('HH:mm•dd/MM/yyyy')
-//                                           .format(currentComment.commentDate),
-//                                       style: const TextStyle(
-//                                         fontSize: 10,
-//                                         color: Colors.black54,
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ).separated(
-//                                   const SizedBox(
-//                                     height: 4,
-//                                   ),
-//                                 ),
-//                               );
-//                             } else {
-//                               return const CircularProgressIndicator();
-//                             }
-//                           })
