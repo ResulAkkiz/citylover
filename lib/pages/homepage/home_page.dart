@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         floatingActionButton: Visibility(
-          visible: userViewModel.user != null,
+          visible: userViewModel.firebaseUser != null,
           child: const FloatingActionButton(),
         ),
         backgroundColor: Colors.white,
@@ -238,12 +238,12 @@ class _HomePageState extends State<HomePage> {
                                                     Builder(
                                                       builder: (context) {
                                                         if (userViewModel
-                                                                .user !=
+                                                                .firebaseUser !=
                                                             null) {
                                                           if (currentSharing
                                                                   .userID !=
                                                               userViewModel
-                                                                  .user!
+                                                                  .firebaseUser!
                                                                   .userID) {
                                                             return IconButton(
                                                               padding:
@@ -368,8 +368,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> getSharingsbyLocation() async {
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
-    if (userViewModel.user != null) {
-      user = await userViewModel.readUser(userViewModel.user!.userID);
+    if (userViewModel.firebaseUser != null) {
+      user = await userViewModel.readUser(userViewModel.firebaseUser!.userID);
       isUserReady = true;
       placeViewModel.savePlace(
           cityName: user!.lastState!, countryName: user!.lastCountry!);

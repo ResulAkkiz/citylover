@@ -60,8 +60,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Future<void> getUser() async {
     final userViewModel = Provider.of<UserViewModel>(context);
-    if (userViewModel.user != null) {
-      user = await userViewModel.readUser(userViewModel.user!.userID);
+    if (userViewModel.firebaseUser != null) {
+      user = await userViewModel.readUser(userViewModel.firebaseUser!.userID);
     }
     isUserReady = true;
     setState(() {});
@@ -89,7 +89,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     height: MediaQuery.of(context).size.height * 0.25,
                     child: InkWell(
                       onTap: () {
-                        if (userViewModel.user != null) {
+                        if (userViewModel.firebaseUser != null) {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const ProfilePage(),
                           ));
@@ -190,25 +190,25 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             Icons.public,
                             color: Colors.black,
                           ),
-                          onPressed:
-                              (countryValue != null && stateValue != null)
-                                  ? () {
-                                      placeViewModel.stateNameList = stateList;
-                                      placeViewModel.savePlace(
-                                          cityName: stateValue!,
-                                          countryName: countryValue!);
-                                      userViewModel.getSharingsbyLocation(
-                                          countryValue!.name, stateValue!.name);
-                                      if (userViewModel.user != null) {
-                                        userViewModel.updateUser(
-                                            userViewModel.user!.userID, {
-                                          'lastState': stateValue?.toMap(),
-                                          'lastCountry': countryValue?.toMap(),
-                                        });
-                                      }
-                                      Navigator.of(context).pop();
-                                    }
-                                  : null,
+                          onPressed: (countryValue != null &&
+                                  stateValue != null)
+                              ? () {
+                                  placeViewModel.stateNameList = stateList;
+                                  placeViewModel.savePlace(
+                                      cityName: stateValue!,
+                                      countryName: countryValue!);
+                                  userViewModel.getSharingsbyLocation(
+                                      countryValue!.name, stateValue!.name);
+                                  if (userViewModel.firebaseUser != null) {
+                                    userViewModel.updateUser(
+                                        userViewModel.firebaseUser!.userID, {
+                                      'lastState': stateValue?.toMap(),
+                                      'lastCountry': countryValue?.toMap(),
+                                    });
+                                  }
+                                  Navigator.of(context).pop();
+                                }
+                              : null,
                           text: "Lokasyonu değiştir",
                         )
                       ],

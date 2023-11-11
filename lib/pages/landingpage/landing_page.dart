@@ -11,7 +11,7 @@ class LandingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     UserViewModel userViewModel = Provider.of<UserViewModel>(context);
 
-    if (userViewModel.user == null) {
+    if (userViewModel.firebaseUser == null) {
       return const FirstPage();
     } else {
       return const HomePage();

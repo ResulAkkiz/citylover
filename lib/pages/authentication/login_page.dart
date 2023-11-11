@@ -175,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                                       await userViewModel.signInEmailPassword(
                                           emailController.text,
                                           passwordController.text);
-                                  if (userViewModel.user != null) {
+                                  if (userViewModel.firebaseUser != null) {
                                     var usermodel = await userViewModel
                                         .readUser(user!.userID);
                                     if (mounted && usermodel!.status!) {

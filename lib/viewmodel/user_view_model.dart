@@ -12,9 +12,10 @@ import '../service/firebase_db_service.dart';
 import '../service/firebase_storage_service.dart';
 
 class UserViewModel extends ChangeNotifier {
+  UserModel? _firebaseUser;
   UserModel? _user;
-
   UserModel? get user => _user;
+  UserModel? get firebaseUser => _firebaseUser;
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   FirebaseDbService firebaseDbService = FirebaseDbService();
   FirebaseStorageService firebaseStorageService = FirebaseStorageService();
@@ -37,7 +38,7 @@ class UserViewModel extends ChangeNotifier {
     LocationModel? lastCountry,
     LocationModel? lastState,
   }) async {
-    _user = await firebaseAuthService.createEmailPassword(
+    _firebaseUser = await firebaseAuthService.createEmailPassword(
       email: email,
       password: password,
       birthdate: birthdate,
@@ -49,26 +50,27 @@ class UserViewModel extends ChangeNotifier {
       lastState: lastState,
     );
     notifyListeners();
-    if (_user != null) {
-      firebaseDbService.saveUser(_user!);
+    if (_firebaseUser != null) {
+      firebaseDbService.saveUser(_firebaseUser!);
     }
-    return _user;
+    return _firebaseUser;
   }
 
   Future<UserModel?> currentUser() async {
-    _user = await firebaseAuthService.currentUser();
+    _firebaseUser = await firebaseAuthService.currentUser();
     notifyListeners();
-    return _user;
+    return _firebaseUser;
   }
 
   Future<UserModel?> signInEmailPassword(String email, String password) async {
-    _user = await firebaseAuthService.signInEmailPassword(email, password);
+    _firebaseUser =
+        await firebaseAuthService.signInEmailPassword(email, password);
     notifyListeners();
-    return _user;
+    return _firebaseUser;
   }
 
   Future<bool?> signOut() async {
-    _user = null;
+    _firebaseUser = null;
     notifyListeners();
     return await firebaseAuthService.signOut();
   }

@@ -89,7 +89,7 @@ class _UpdateEmailPageState extends State<UpdateEmailPage> {
                               emailController.text, passwordController.text);
                           if (isSuccesful) {
                             await userViewModel.updateUser(
-                                userViewModel.user!.userID,
+                                userViewModel.firebaseUser!.userID,
                                 {'userEmail': emailController.text});
                             await userViewModel.signOut();
                             if (mounted) {

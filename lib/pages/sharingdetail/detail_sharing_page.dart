@@ -52,7 +52,7 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       bottomSheet: Visibility(
-        visible: userViewModel.user != null,
+        visible: userViewModel.firebaseUser != null,
         child: CommentBox(
           user: userModel,
           sharingModel: sharingModel,
@@ -217,9 +217,10 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                       }),
                                   Builder(
                                     builder: (context) {
-                                      if (userViewModel.user != null) {
+                                      if (userViewModel.firebaseUser != null) {
                                         if (sharingModel.userID !=
-                                            userViewModel.user!.userID) {
+                                            userViewModel
+                                                .firebaseUser!.userID) {
                                           return IconButton(
                                             padding: EdgeInsets.zero,
                                             onPressed: () async {
@@ -338,10 +339,11 @@ class _DetailSharingPageState extends State<DetailSharingPage> {
                                           ),
                                           Builder(
                                             builder: (context) {
-                                              if (userViewModel.user != null) {
+                                              if (userViewModel.firebaseUser !=
+                                                  null) {
                                                 if (currentComment.userID !=
                                                     userViewModel
-                                                        .user!.userID) {
+                                                        .firebaseUser!.userID) {
                                                   return IconButton(
                                                     padding: EdgeInsets.zero,
                                                     onPressed: () async {

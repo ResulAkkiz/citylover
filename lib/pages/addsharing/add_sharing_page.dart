@@ -7,10 +7,12 @@ import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
+import 'package:citylover/viewmodel/add_sharing_viewmodel.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
@@ -30,35 +32,14 @@ class _AddSharingPageState extends State<AddSharingPage> {
   String? city;
   bool buttonIgnore = false;
 
-  AssetEntity? selectedAsset;
-  AssetPathEntity? selectedAlbum;
-  List<AssetPathEntity> albumList = [];
-  List<AssetEntity> assetList = [];
-  List<AssetEntity> previewAssetList = [];
-  List<AssetEntity> selectedAssetList = [];
+  ImagePicker imagePicker = ImagePicker();
 
   bool isUserReady = false;
   final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
-    getAlbums();
-  }
-
-  Future<void> getAlbums() async {
-    albumList = await MediaServices.loadAlbums(RequestType.common);
-
-    selectedAlbum = albumList.first;
-
-    log((selectedAlbum == null).toString());
-
-    if (selectedAlbum != null) {
-      log(selectedAlbum!.name.toString());
-      assetList = await MediaServices.loadAssets(selectedAlbum!);
-      previewAssetList = assetList.take(10).toList();
-    }
-
-    setState(() {});
   }
 
   @override
@@ -66,27 +47,17 @@ class _AddSharingPageState extends State<AddSharingPage> {
     final placeViewModel = Provider.of<PlaceViewModel>(context);
     country = placeViewModel.country!.name;
     city = placeViewModel.city!.name;
-    getUser();
-    super.didChangeDependencies();
-  }
 
-  void checkSelectedAsset(AssetEntity selectedAsset) {
-    if (selectedAssetList.contains(selectedAsset)) {
-      selectedAssetList.remove(selectedAsset);
-      setState(() {});
-    } else {
-      if (selectedAssetList.length <= 4) {
-        selectedAssetList.add(selectedAsset);
-        setState(() {});
-      }
-    }
+    super.didChangeDependencies();
   }
 
   TextEditingController sharingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    log("Buildddd");
     final userViewModel = Provider.of<UserViewModel>(context);
     final placeViewModel = Provider.of<PlaceViewModel>(context);
+    //final sharingViewModel = Provider.of<AddSharingViewModel>(context);
     return Scaffold(
         bottomSheet: Container(
           decoration: const BoxDecoration(color: Colors.white, boxShadow: [
@@ -98,65 +69,77 @@ class _AddSharingPageState extends State<AddSharingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (selectedAssetList.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        physics: const NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: selectedAssetList.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: Container(
-                                    margin: const EdgeInsets.all(2.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
-                                        border: Border.all(
-                                            color: ThemeColors.primary300,
-                                            width: 1)),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(14.0),
-                                      child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: AssetEntityImage(
-                                              selectedAssetList[index])),
-                                    )),
+              Consumer<AddSharingViewModel>(
+                builder: (context, sharingViewModel, child) {
+                  log("Selected asset consumer tetiklendi");
+                  return sharingViewModel.selectedAssetList.isNotEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 50,
+                              child: ListView.builder(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                physics: const NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    sharingViewModel.selectedAssetList.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  final currentSelectedAsset =
+                                      sharingViewModel.selectedAssetList[index];
+                                  return Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      AspectRatio(
+                                        aspectRatio: 1,
+                                        child: Container(
+                                            margin: const EdgeInsets.all(2.0),
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15.0),
+                                                border: Border.all(
+                                                    color:
+                                                        ThemeColors.primary300,
+                                                    width: 1)),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(14.0),
+                                              child: FittedBox(
+                                                  fit: BoxFit.cover,
+                                                  child: AssetEntityImage(
+                                                      currentSelectedAsset)),
+                                            )),
+                                      ),
+                                      if (sharingViewModel.selectedAssetList
+                                          .contains(currentSelectedAsset))
+                                        IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            onPressed: () {
+                                              sharingViewModel
+                                                  .removefromSelectedAsset(
+                                                      currentSelectedAsset);
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            ))
+                                    ],
+                                  );
+                                },
                               ),
-                              if (selectedAssetList
-                                  .contains(selectedAssetList[index]))
-                                IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () {
-                                      selectedAssetList
-                                          .remove(selectedAssetList[index]);
-                                      setState(() {});
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ))
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    const Divider(
-                      height: 1,
-                      color: Colors.black54,
-                    )
-                  ],
-                ),
+                            ),
+                            const Divider(
+                              height: 1,
+                              color: Colors.black54,
+                            )
+                          ],
+                        )
+                      : const SizedBox.shrink();
+                },
+              ),
               SizedBox(
                 height: 75,
                 child: SingleChildScrollView(
@@ -170,58 +153,85 @@ class _AddSharingPageState extends State<AddSharingPage> {
                             borderRadius: BorderRadius.circular(18.0),
                             border: Border.all(
                                 color: ThemeColors.primary300, width: 1)),
-                        child: Icon(
-                          Icons.photo_camera_rounded,
+                        child: IconButton(
+                          onPressed: () {
+                            // _kameradanCek();
+                          },
+                          icon: const Icon(Icons.photo_camera_rounded),
                           color: ThemeColors.primary400,
                         ),
                       ),
                     ),
-                    ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: previewAssetList.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                checkSelectedAsset(previewAssetList[index]);
-                              },
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: Container(
-                                    margin: const EdgeInsets.all(4.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(19.0),
-                                        border: Border.all(
-                                            color: ThemeColors.primary300,
-                                            width: 1)),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      child: AssetEntityImage(
-                                        previewAssetList[index],
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )),
-                              ),
-                            ),
-                            if (selectedAssetList.contains(assetList[index]))
-                              CircleAvatar(
-                                backgroundColor: ThemeColors.primary300,
-                                radius: 10,
-                                child: Text(
-                                  (selectedAssetList.indexOf(
-                                              previewAssetList[index]) +
-                                          1)
-                                      .toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 10),
+                    Consumer<AddSharingViewModel>(
+                      builder: (context, sharingViewModel, child) {
+                        log("Preview asset consumer tetiklendi");
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: sharingViewModel.previewAssetList.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final currentPreviewAsset =
+                                sharingViewModel.previewAssetList[index];
+                            return Stack(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    sharingViewModel
+                                        .selectAsset(currentPreviewAsset);
+                                  },
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Container(
+                                        margin: const EdgeInsets.all(4.0),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(19.0),
+                                            border: Border.all(
+                                                color: ThemeColors.primary300,
+                                                width: 1)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(18.0),
+                                          child: AssetEntityImage(
+                                            sharingViewModel
+                                                .previewAssetList[index],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )),
+                                  ),
                                 ),
-                              )
-                          ],
+                                if (sharingViewModel.selectedAssetList
+                                    .contains(currentPreviewAsset))
+                                  Positioned.fill(
+                                    child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: CircleAvatar(
+                                        backgroundColor: ThemeColors.primary300,
+                                        radius: 10,
+                                        child: Text(
+                                          (sharingViewModel.selectedAssetList
+                                                      .indexOf(
+                                                          currentPreviewAsset) +
+                                                  1)
+                                              .toString(),
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                if (currentPreviewAsset.type == AssetType.video)
+                                  const Positioned.fill(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Icon(Icons.videocam),
+                                    ),
+                                  )
+                              ],
+                            );
+                          },
                         );
                       },
                     ),
@@ -287,37 +297,50 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                                   ),
                                                 ),
                                                 Expanded(
-                                                  child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount: albumList.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return ListTile(
-                                                        onTap: () async {
-                                                          selectedAlbum =
-                                                              albumList[index];
+                                                  child: Consumer<
+                                                      AddSharingViewModel>(
+                                                    builder: (context,
+                                                        sharingViewModel,
+                                                        child) {
+                                                      return ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount:
+                                                            sharingViewModel
+                                                                .albumList
+                                                                .length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final currentAlbum =
+                                                              sharingViewModel
+                                                                      .albumList[
+                                                                  index];
+                                                          return ListTile(
+                                                            onTap: () async {
+                                                              sharingViewModel
+                                                                      .updateSelectedAlbum =
+                                                                  currentAlbum;
+                                                              sharingViewModel
+                                                                  .getAssetfromAlbum();
 
-                                                          assetList =
-                                                              await MediaServices
-                                                                  .loadAssets(
-                                                                      selectedAlbum!);
-                                                          outerSetState(() {
-                                                            Navigator.pop(
-                                                                context);
-                                                          });
+                                                              outerSetState(() {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              });
+                                                            },
+                                                            title: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          12.0,
+                                                                      horizontal:
+                                                                          4.0),
+                                                              child: Text(
+                                                                  currentAlbum
+                                                                      .name),
+                                                            ),
+                                                          );
                                                         },
-                                                        title: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical:
-                                                                      12.0,
-                                                                  horizontal:
-                                                                      4.0),
-                                                          child: Text(
-                                                              albumList[index]
-                                                                  .name),
-                                                        ),
                                                       );
                                                     },
                                                   ),
@@ -349,7 +372,14 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Text(selectedAlbum!.name),
+                                              Consumer<AddSharingViewModel>(
+                                                builder: (context,
+                                                    sharingViewModel, child) {
+                                                  log("Selected album consumer tetiklendi.");
+                                                  return Text(sharingViewModel
+                                                      .selectedAlbum!.name);
+                                                },
+                                              ),
                                               const Icon(
                                                   Icons.expand_more_rounded)
                                             ],
@@ -359,53 +389,120 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                     ),
                                   ),
                                   Expanded(
-                                    child: GridView.builder(
-                                      physics: const BouncingScrollPhysics(),
-                                      itemCount: assetList.length,
-                                      shrinkWrap: true,
-                                      gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 4,
-                                              mainAxisSpacing: 2,
-                                              crossAxisSpacing: 2),
-                                      itemBuilder: (context, index) {
-                                        AssetEntity currentAsset =
-                                            assetList[index];
-                                        return Stack(
-                                          alignment: Alignment.topRight,
-                                          children: [
-                                            InkWell(
-                                              onTap: () {
-                                                checkSelectedAsset(
-                                                    assetList[index]);
-                                                outerSetState(
-                                                  () {},
-                                                );
-                                              },
-                                              child: AspectRatio(
-                                                  aspectRatio: 1,
-                                                  child: AssetEntityImage(
-                                                      fit: BoxFit.cover,
-                                                      currentAsset)),
-                                            ),
-                                            if (selectedAssetList
-                                                .contains(assetList[index]))
-                                              CircleAvatar(
-                                                backgroundColor:
-                                                    ThemeColors.primary300,
-                                                radius: 10,
-                                                child: Text(
-                                                  (selectedAssetList.indexOf(
-                                                              assetList[
-                                                                  index]) +
-                                                          1)
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10),
+                                    child: Consumer<AddSharingViewModel>(
+                                      builder:
+                                          (context, sharingViewModel, child) {
+                                        log("bottom asset consumer tetiklendi");
+                                        return GridView.builder(
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          itemCount:
+                                              sharingViewModel.assetList.length,
+                                          shrinkWrap: true,
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 4,
+                                                  mainAxisSpacing: 2,
+                                                  crossAxisSpacing: 2),
+                                          itemBuilder: (context, index) {
+                                            AssetEntity currentAsset =
+                                                sharingViewModel
+                                                    .assetList[index];
+                                            return Stack(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    sharingViewModel
+                                                        .selectAsset(
+                                                            sharingViewModel
+                                                                    .assetList[
+                                                                index]);
+                                                    outerSetState(
+                                                      () {},
+                                                    );
+                                                  },
+                                                  child: AspectRatio(
+                                                      aspectRatio: 1,
+                                                      child: AssetEntityImage(
+                                                          fit: BoxFit.cover,
+                                                          currentAsset)),
                                                 ),
-                                              )
-                                          ],
+                                                if (sharingViewModel
+                                                    .selectedAssetList
+                                                    .contains(currentAsset))
+                                                  Positioned.fill(
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: CircleAvatar(
+                                                        backgroundColor:
+                                                            ThemeColors
+                                                                .primary300,
+                                                        radius: 10,
+                                                        child: Text(
+                                                          (sharingViewModel
+                                                                      .selectedAssetList
+                                                                      .indexOf(
+                                                                          currentAsset) +
+                                                                  1)
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                if (currentAsset.type ==
+                                                    AssetType.video)
+                                                  const Positioned.fill(
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Icon(
+                                                        Icons.videocam_rounded,
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                if (currentAsset.type ==
+                                                    AssetType.video)
+                                                  Positioned.fill(
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.bottomLeft,
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .all(4.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 4,
+                                                                horizontal: 4),
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                                Colors.black54,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        24)),
+                                                        child: Text(
+                                                          currentAsset.duration
+                                                              .formatSecond(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                              ],
+                                            );
+                                          },
                                         );
                                       },
                                     ),
@@ -570,10 +667,32 @@ class _AddSharingPageState extends State<AddSharingPage> {
               ));
   }
 
+  // void _kameradanCek() async {
+  //   var yeniResim = await imagePicker.pickImage(source: ImageSource.camera);
+  //   final fileData = await yeniResim!.readAsBytes();
+  //   final tempDir = await getTemporaryDirectory();
+  //   final tempFile = File('${tempDir.path}/${yeniResim.name}');
+  //   await tempFile.writeAsBytes(fileData);
+  //   AssetEntity? assetEntity;
+  //   final savedFile = await PhotoManager.editor.saveImage(
+  //     fileData,
+  //     title: yeniResim.name,
+  //   );
+  //   if (savedFile != null) {
+  //     assetEntity = savedFile;
+  //   }
+
+  //   await tempFile.delete();
+
+  //   selectedAssetList.add(assetEntity!);
+
+  //   setState(() {});
+  // }
+
   Future<void> getUser() async {
     final userViewModel = Provider.of<UserViewModel>(context);
-    if (userViewModel.user != null) {
-      user = await userViewModel.readUser(userViewModel.user!.userID);
+    if (userViewModel.firebaseUser != null) {
+      user = await userViewModel.readUser(userViewModel.firebaseUser!.userID);
       isUserReady = true;
     }
 
@@ -595,7 +714,7 @@ class MediaServices {
   }
 
   static Future<List<AssetEntity>> loadAssets(
-      AssetPathEntity selectedAlbum) async {
+      AssetPathEntity selectedAlbum, int start, int end) async {
     List<AssetEntity> assetList = await selectedAlbum.getAssetListRange(
         start: 0, end: await selectedAlbum.assetCountAsync);
 

@@ -406,8 +406,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void getStarted() async {
     UserViewModel userViewModel =
         Provider.of<UserViewModel>(context, listen: false);
-    if (userViewModel.user != null) {
-      user = await userViewModel.readUser(userViewModel.user!.userID);
+    if (userViewModel.firebaseUser != null) {
+      user = await userViewModel.readUser(userViewModel.firebaseUser!.userID);
       nameController.text = user!.userName ?? '';
       surnameController.text = user!.userSurname ?? '';
       emailController.text = user!.userEmail;
@@ -416,8 +416,8 @@ class _ProfilePageState extends State<ProfilePage> {
           .format(user?.userBirthdate ?? DateTime.now());
 
       choose = int.parse(user!.userGender ?? '0');
-      sharingList =
-          await userViewModel.getSharingsbyID(userViewModel.user!.userID);
+      sharingList = await userViewModel
+          .getSharingsbyID(userViewModel.firebaseUser!.userID);
       debugPrint(sharingList.toString());
     }
     isUserReady = true;
