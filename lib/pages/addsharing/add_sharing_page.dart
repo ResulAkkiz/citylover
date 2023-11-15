@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/image_enums.dart';
+import 'package:citylover/app_contants/multistyle_textcontroller.dart';
 import 'package:citylover/app_contants/string_generator.dart';
 import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:citylover/common_widgets/custom_back_button.dart';
@@ -12,6 +13,7 @@ import 'package:citylover/pages/homepage/home_page.dart';
 import 'package:citylover/viewmodel/add_sharing_viewmodel.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,18 +35,20 @@ class _AddSharingPageState extends State<AddSharingPage> {
   UserModel? user;
   String? country;
   String? city;
-  bool buttonIgnore = false;
+
   late ImagePicker imagePicker = ImagePicker();
   final ScrollController _controller = ScrollController();
-  // ValueNotifier<TextEditingController> contentController =
-  //     ValueNotifier(TextEditingController());
-  ValueNotifier<String> contentText = ValueNotifier("");
+  final ValueNotifier<String> contentText = ValueNotifier("");
+  final MultiStyleTextEditingController _textcontroller =
+      MultiStyleTextEditingController();
+
   bool isUserReady = false;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_scrollListener);
+    log("InitState");
   }
 
   @override
@@ -52,6 +56,11 @@ class _AddSharingPageState extends State<AddSharingPage> {
     final sharingViewModel =
         Provider.of<AddSharingViewModel>(context, listen: false);
     sharingViewModel.resetIndexValues();
+    if (_textcontroller.text.isNotEmpty) {
+      sharingViewModel.contentText = _textcontroller.text;
+    }
+
+    log("Deactive");
 
     super.deactivate();
   }
@@ -59,6 +68,7 @@ class _AddSharingPageState extends State<AddSharingPage> {
   @override
   void dispose() {
     _controller.dispose();
+    log("Dispose");
     super.dispose();
   }
 
@@ -80,324 +90,335 @@ class _AddSharingPageState extends State<AddSharingPage> {
   @override
   void didChangeDependencies() {
     final placeViewModel = Provider.of<PlaceViewModel>(context);
-    country = placeViewModel.country!.name;
-    city = placeViewModel.city!.name;
-    getUser();
+    final sharingViewModel = Provider.of<AddSharingViewModel>(context);
+
+    if (_textcontroller.text.isEmpty) {
+      _textcontroller.text = sharingViewModel.contentText;
+    }
+    if (country == null || city == null) {
+      country = placeViewModel.country!.name;
+      city = placeViewModel.city!.name;
+    }
+    if (user == null) {
+      getUser();
+    }
+
+    log("DidChangeDependencies");
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    log("Buildddd");
+    log("Build");
     final userViewModel = Provider.of<UserViewModel>(context);
     final placeViewModel = Provider.of<PlaceViewModel>(context);
 
     return Scaffold(
-        bottomSheet: Container(
-          decoration: const BoxDecoration(color: Colors.white, boxShadow: [
-            BoxShadow(
-                color: Colors.black54, offset: Offset(-1, -1), blurRadius: 4)
-          ]),
-          width: MediaQuery.sizeOf(context).width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SelectedAssetWidget(),
-              SizedBox(
-                height: 75,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: [
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: Container(
-                        margin: const EdgeInsets.all(4.0),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18.0),
-                            border: Border.all(
-                                color: ThemeColors.primary300, width: 1)),
-                        child: IconButton(
-                          onPressed: () {
-                            _kameradanCek();
-                          },
-                          icon: const Icon(Icons.photo_camera_rounded),
-                          color: ThemeColors.primary400,
-                        ),
-                      ),
-                    ),
-                    const PreviewAssetWidget(),
-                    InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          enableDrag: false,
-                          showDragHandle: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(20.0)),
-                          ),
-                          isScrollControlled: true,
-                          constraints: BoxConstraints.expand(
-                              height: MediaQuery.sizeOf(context).height * 0.9),
-                          context: context,
-                          builder: (context) {
-                            return Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                      enableDrag: false,
-                                      showDragHandle: true,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20.0)),
-                                      ),
-                                      isScrollControlled: true,
-                                      constraints: BoxConstraints.expand(
-                                          height: MediaQuery.sizeOf(context)
-                                                  .height *
-                                              0.9),
-                                      context: context,
-                                      builder: (context) {
-                                        return Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text(
-                                                      "İptal Et",
-                                                      style: TextStyle(
-                                                          color: ThemeColors
-                                                              .primary400),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            AlbumListWidget(
-                                                controller: _controller)
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            "İptal Et",
-                                            style: TextStyle(
-                                                color: ThemeColors.primary400),
-                                          ),
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Consumer<AddSharingViewModel>(
-                                              builder: (context,
-                                                  sharingViewModel, child) {
-                                                log("Selected album consumer tetiklendi.");
-                                                return Text(sharingViewModel
-                                                    .selectedAlbum!.name);
-                                              },
-                                            ),
-                                            const Icon(
-                                                Icons.expand_more_rounded)
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Consumer<AddSharingViewModel>(
-                                    builder:
-                                        (context, sharingViewModel, child) {
-                                      log("bottom asset consumer tetiklendi");
-                                      return SingleChildScrollView(
-                                        controller: _controller,
-                                        child: Column(
-                                          children: [
-                                            GridView.builder(
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              itemCount: sharingViewModel
-                                                  .assetList.length,
-                                              shrinkWrap: true,
-                                              gridDelegate:
-                                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: 2,
-                                                      mainAxisSpacing: 2,
-                                                      crossAxisSpacing: 2),
-                                              itemBuilder: (context, index) {
-                                                AssetEntity currentAsset =
-                                                    sharingViewModel
-                                                        .assetList[index];
-                                                return Stack(
-                                                  children: [
-                                                    InkWell(
-                                                      onTap: () {
-                                                        sharingViewModel
-                                                            .selectAsset(
-                                                                sharingViewModel
-                                                                        .assetList[
-                                                                    index]);
-                                                      },
-                                                      child: AspectRatio(
-                                                        aspectRatio: 1,
-                                                        child: AssetEntityImage(
-                                                            loadingBuilder:
-                                                                (context, child,
-                                                                    loadingProgress) {
-                                                          if (loadingProgress ==
-                                                              null) {
-                                                            return child; // Orijinal widget'i döndürün.
-                                                          } else {
-                                                            return const CircularProgressIndicator(
-                                                              color: Colors.red,
-                                                            );
-                                                          }
-                                                        },
-                                                            fit: BoxFit.cover,
-                                                            currentAsset),
-                                                      ),
-                                                    ),
-                                                    if (sharingViewModel
-                                                        .selectedAssetList
-                                                        .contains(currentAsset))
-                                                      Positioned.fill(
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: CircleAvatar(
-                                                            backgroundColor:
-                                                                ThemeColors
-                                                                    .primary300,
-                                                            radius: 10,
-                                                            child: Text(
-                                                              (sharingViewModel
-                                                                          .selectedAssetList
-                                                                          .indexOf(
-                                                                              currentAsset) +
-                                                                      1)
-                                                                  .toString(),
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 10),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    if (currentAsset.type ==
-                                                        AssetType.video)
-                                                      const Positioned.fill(
-                                                        child: Align(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Icon(
-                                                            Icons
-                                                                .videocam_rounded,
-                                                            color: Colors.red,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    if (currentAsset.type ==
-                                                        AssetType.video)
-                                                      Positioned.fill(
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomLeft,
-                                                          child: Container(
-                                                            margin:
-                                                                const EdgeInsets
-                                                                    .all(4.0),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical: 4,
-                                                                    horizontal:
-                                                                        4),
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .black54,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            24)),
-                                                            child: Text(
-                                                              currentAsset
-                                                                  .duration
-                                                                  .formatSecond(),
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 10),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                            if (sharingViewModel.loadMore)
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(16.0),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: ThemeColors.primary400,
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                )
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: AspectRatio(
+        bottomNavigationBar: BottomAppBar(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+              BoxShadow(
+                  color: Colors.black54, offset: Offset(-1, -1), blurRadius: 4)
+            ]),
+            width: MediaQuery.sizeOf(context).width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SelectedAssetWidget(),
+                SizedBox(
+                  height: 75,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      AspectRatio(
                         aspectRatio: 1,
                         child: Container(
-                          margin: const EdgeInsets.all(2.0),
+                          margin: const EdgeInsets.all(4.0),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18.0),
                               border: Border.all(
                                   color: ThemeColors.primary300, width: 1)),
-                          child: Icon(
-                            Icons.photo_rounded,
+                          child: IconButton(
+                            onPressed: () {
+                              _kameradanCek();
+                            },
+                            icon: const Icon(Icons.photo_camera_rounded),
                             color: ThemeColors.primary400,
                           ),
                         ),
                       ),
-                    )
-                  ]),
+                      const PreviewAssetWidget(),
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            enableDrag: false,
+                            showDragHandle: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20.0)),
+                            ),
+                            isScrollControlled: true,
+                            constraints: BoxConstraints.expand(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.9),
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        enableDrag: false,
+                                        showDragHandle: true,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20.0)),
+                                        ),
+                                        isScrollControlled: true,
+                                        constraints: BoxConstraints.expand(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.9),
+                                        context: context,
+                                        builder: (context) {
+                                          return Column(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(
+                                                        "İptal Et",
+                                                        style: TextStyle(
+                                                            color: ThemeColors
+                                                                .primary400),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              AlbumListWidget(
+                                                  controller: _controller)
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "İptal Et",
+                                              style: TextStyle(
+                                                  color:
+                                                      ThemeColors.primary400),
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Consumer<AddSharingViewModel>(
+                                                builder: (context,
+                                                    sharingViewModel, child) {
+                                                  log("Selected Asset Consumer.");
+                                                  return Text(sharingViewModel
+                                                      .selectedAlbum!.name);
+                                                },
+                                              ),
+                                              const Icon(
+                                                  Icons.expand_more_rounded)
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Consumer<AddSharingViewModel>(
+                                      builder:
+                                          (context, sharingViewModel, child) {
+                                        log("Grid Asset Consumer");
+                                        return SingleChildScrollView(
+                                          controller: _controller,
+                                          child: Column(
+                                            children: [
+                                              GridView.builder(
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: sharingViewModel
+                                                    .assetList.length,
+                                                shrinkWrap: true,
+                                                gridDelegate:
+                                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                                        crossAxisCount: 2,
+                                                        mainAxisSpacing: 2,
+                                                        crossAxisSpacing: 2),
+                                                itemBuilder: (context, index) {
+                                                  AssetEntity currentAsset =
+                                                      sharingViewModel
+                                                          .assetList[index];
+                                                  return Stack(
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          sharingViewModel
+                                                              .selectAsset(
+                                                                  sharingViewModel
+                                                                          .assetList[
+                                                                      index]);
+                                                        },
+                                                        child: AspectRatio(
+                                                          aspectRatio: 1,
+                                                          child:
+                                                              AssetEntityImage(
+                                                            currentAsset,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (sharingViewModel
+                                                          .selectedAssetList
+                                                          .contains(
+                                                              currentAsset))
+                                                        Positioned.fill(
+                                                          child: Align(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: CircleAvatar(
+                                                              backgroundColor:
+                                                                  ThemeColors
+                                                                      .primary300,
+                                                              radius: 10,
+                                                              child: Text(
+                                                                (sharingViewModel
+                                                                            .selectedAssetList
+                                                                            .indexOf(currentAsset) +
+                                                                        1)
+                                                                    .toString(),
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        10),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if (currentAsset.type ==
+                                                          AssetType.video)
+                                                        const Positioned.fill(
+                                                          child: Align(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Icon(
+                                                              Icons
+                                                                  .videocam_rounded,
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if (currentAsset.type ==
+                                                          AssetType.video)
+                                                        Positioned.fill(
+                                                          child: Align(
+                                                            alignment: Alignment
+                                                                .bottomLeft,
+                                                            child: Container(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .all(4.0),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          4,
+                                                                      horizontal:
+                                                                          4),
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              24)),
+                                                              child: Text(
+                                                                currentAsset
+                                                                    .duration
+                                                                    .formatSecond(),
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        10),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                              if (sharingViewModel.loadMore)
+                                                Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16.0),
+                                                    child:
+                                                        CupertinoActivityIndicator(
+                                                      color: ThemeColors
+                                                          .primary500,
+                                                    ))
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Container(
+                            margin: const EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18.0),
+                                border: Border.all(
+                                    color: ThemeColors.primary300, width: 1)),
+                            child: Icon(
+                              Icons.photo_rounded,
+                              color: ThemeColors.primary400,
+                            ),
+                          ),
+                        ),
+                      )
+                    ]),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         backgroundColor: Colors.white,
@@ -414,16 +435,14 @@ class _AddSharingPageState extends State<AddSharingPage> {
                   ValueListenableBuilder(
                     valueListenable: contentText,
                     builder: (context, text, child) {
-                      log(text);
                       return ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             elevation: 8,
                             backgroundColor: ThemeColors.primary400,
                             shape: const StadiumBorder()),
-                        onPressed: text.trim() != ''
+                        onPressed: text.trim() != '' &&
+                                text.trim().length <= 1000
                             ? () async {
-                                buttonIgnore = true;
-                                setState(() {});
                                 bool? isSuccessful =
                                     await userViewModel.addSharing(SharingModel(
                                         sharingID: getRandomString(12),
@@ -448,7 +467,6 @@ class _AddSharingPageState extends State<AddSharingPage> {
                                                       const HomePage()),
                                               (Route<dynamic> route) => false));
                                 }
-                                buttonIgnore = false;
                               }
                             : null,
                         child: const Text(
@@ -471,25 +489,19 @@ class _AddSharingPageState extends State<AddSharingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   direction: Axis.horizontal,
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: CircleAvatar(
-                            backgroundImage: AssetImage(ImageEnum.user.toPath)),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 4,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: CircleAvatar(
+                          backgroundImage: AssetImage(ImageEnum.user.toPath)),
                     ),
                     Expanded(
-                      flex: 9,
                       child: TextField(
                         autofocus: true,
                         maxLines: null,
                         onChanged: (value) {
                           contentText.value = value;
                         },
+                        controller: _textcontroller,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(
                               '[a-z A-Z á-ú Á-Ú 0-9 !@#%^&*(),.?":{}|<>]')),
@@ -611,7 +623,7 @@ class PreviewAssetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AddSharingViewModel>(
       builder: (context, sharingViewModel, child) {
-        log("Preview asset consumer tetiklendi");
+        log("Preview Asset Consumer.");
         return ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           scrollDirection: Axis.horizontal,
@@ -624,7 +636,6 @@ class PreviewAssetWidget extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    log("$index");
                     sharingViewModel.selectAsset(currentPreviewAsset);
                   },
                   child: AspectRatio(
@@ -711,7 +722,7 @@ class SelectedAssetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AddSharingViewModel>(
       builder: (context, sharingViewModel, child) {
-        log("Selected asset consumer tetiklendi");
+        log("Selected Asset Consumer");
         return sharingViewModel.selectedAssetList.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -743,7 +754,12 @@ class SelectedAssetWidget extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(14.0),
                                     child: AssetEntityImage(
                                       currentSelectedAsset,
-                                      thumbnailFormat: ThumbnailFormat.png,
+                                      isOriginal: false, // Defaults to `true`.
+                                      thumbnailSize: const ThumbnailSize.square(
+                                          50), // Preferred value.
+                                      thumbnailFormat: ThumbnailFormat
+                                          .jpeg, // Defaults to `jpeg`.
+
                                       fit: BoxFit.cover,
                                     ),
                                   )),
@@ -795,6 +811,9 @@ class MediaServices {
       AssetPathEntity selectedAlbum, int start, int end) async {
     List<AssetEntity> assetList =
         await selectedAlbum.getAssetListRange(start: start, end: end);
+    await PhotoCachingManager().requestCacheAssets(
+        assets: assetList,
+        option: const ThumbnailOption(size: ThumbnailSize.square(50)));
     return assetList;
   }
 }

@@ -12,13 +12,14 @@ class AddSharingViewModel extends ChangeNotifier {
   final List<AssetEntity> _assetList = [];
   List<AssetEntity> _previewAssetList = [];
   final List<AssetEntity> _selectedAssetList = [];
+  String contentText = "";
+  int _assetCount = 0;
 
   List<AssetPathEntity> get albumList => _albumList;
   List<AssetEntity> get assetList => _assetList;
   List<AssetEntity> get previewAssetList => _previewAssetList;
   List<AssetEntity> get selectedAssetList => _selectedAssetList;
   AssetPathEntity? get selectedAlbum => _selectedAlbum;
-  int _assetCount = 0;
   bool get loadMore => startIndex < _assetCount;
 
   int interval = 10;
@@ -33,8 +34,7 @@ class AddSharingViewModel extends ChangeNotifier {
   Future<void> getAlbums(RequestType requestType) async {
     _albumList = await MediaServices.loadAlbums(requestType);
     _selectedAlbum = albumList.first;
-
-    await getAssetfromAlbum(); //0-10
+    await getAssetfromAlbum();
   }
 
   set updateSelectedAlbum(AssetPathEntity newSelectedAlbum) {
@@ -89,11 +89,12 @@ class AddSharingViewModel extends ChangeNotifier {
   void selectAsset(AssetEntity asset) {
     if (_selectedAssetList.contains(asset)) {
       _selectedAssetList.remove(asset);
+      notifyListeners();
     } else {
       if (_selectedAssetList.length <= 4) {
         _selectedAssetList.add(asset);
+        notifyListeners();
       }
     }
-    notifyListeners();
   }
 }
