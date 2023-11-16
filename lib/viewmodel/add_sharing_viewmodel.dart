@@ -1,12 +1,10 @@
 import 'dart:developer';
 
 import 'package:citylover/app_contants/media_services.dart';
-import 'package:citylover/models/usermodel.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class AddSharingViewModel extends ChangeNotifier {
-  UserModel? user;
   AssetPathEntity? _selectedAlbum;
   List<AssetPathEntity> _albumList = [];
   final List<AssetEntity> _assetList = [];

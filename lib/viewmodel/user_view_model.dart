@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:citylover/locator/locator.dart';
@@ -23,11 +24,12 @@ class UserViewModel extends ChangeNotifier {
       locator.get<FirebaseStorageService>();
 
   UserViewModel() {
-    debugPrint('userviewmodel constructor method tetiklendi');
+    log("UserViewModel Constructor.");
     currentUser();
   }
   List<CommentModel> commentList = [];
   List<SharingModel> sharingList = [];
+  List<SharingModel> userSharingList = [];
 
   Future<UserModel?> createEmailPassword({
     required String email,
@@ -60,6 +62,9 @@ class UserViewModel extends ChangeNotifier {
 
   Future<UserModel?> currentUser() async {
     _firebaseUser = await firebaseAuthService.currentUser();
+    if (_firebaseUser != null) {
+      _user = await firebaseDbService.readUser(_firebaseUser!.userID);
+    }
     notifyListeners();
     return _firebaseUser;
   }
@@ -82,11 +87,15 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<List<SharingModel>> getSharingsbyID(String userID) async {
-    return await firebaseDbService.getSharingsbyID(userID);
+    userSharingList = await firebaseDbService.getSharingsbyID(userID);
+    notifyListeners();
+    return userSharingList;
   }
 
   Future<UserModel?> readUser(String userId) async {
-    return await firebaseDbService.readUser(userId);
+    _user = await firebaseDbService.readUser(userId);
+
+    return _user;
   }
 
   Future<bool> addSharing(SharingModel sharingModel) async {
@@ -133,7 +142,18 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
-    return firebaseDbService.updateUser(userId, newMap);
+    bool isCompleted = await firebaseDbService.updateUser(userId, newMap);
+
+    if (isCompleted) {
+      try {
+        _user = await firebaseDbService.readUser(userId);
+      } catch (e) {
+        _user = null;
+        _user = await firebaseDbService.readUser(userId);
+      }
+    }
+    notifyListeners();
+    return (_user != null && isCompleted);
   }
 
   Future<bool> resetPassword(String email) async {
