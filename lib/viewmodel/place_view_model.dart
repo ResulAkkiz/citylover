@@ -1,9 +1,10 @@
+import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/service/country_service.dart';
 import 'package:flutter/material.dart';
 
 class PlaceViewModel extends ChangeNotifier {
-  CountryService countryService = CountryService();
+  CountryService countryService = locator.get<CountryService>();
   LocationModel? _city;
   LocationModel? _country;
   LocationModel? get city => _city;

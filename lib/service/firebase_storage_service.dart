@@ -1,8 +1,10 @@
 import 'dart:io';
+
+import 'package:citylover/locator/locator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseStorageService {
-  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  final FirebaseStorage _firebaseStorage = locator<FirebaseStorage>();
   late Reference _storageRef;
 
   Future<String> uploadFile(

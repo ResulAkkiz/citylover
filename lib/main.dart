@@ -1,4 +1,5 @@
 import 'package:citylover/app_contants/custom_theme.dart';
+import 'package:citylover/locator/locator.dart';
 import 'package:citylover/pages/splashpage/splash_page.dart';
 import 'package:citylover/viewmodel/add_sharing_viewmodel.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());

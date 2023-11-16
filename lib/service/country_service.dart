@@ -1,29 +1,28 @@
 import 'package:citylover/models/country_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_excel/excel.dart';
-import 'package:http/http.dart' as http;
 
 class CountryService {
-  Future<List<LocationModel>> fetchDataCountry() async {
-    var headers = {
-      'X-CSCAPI-KEY': 'T0sxZ093MGp6TjFjZDRZdEhtc3RjYkRkWUkyeXJySXJKODhmaGl0MQ=='
-    };
+  // Future<List<LocationModel>> fetchDataCountry() async {
+  //   var headers = {
+  //     'X-CSCAPI-KEY': 'T0sxZ093MGp6TjFjZDRZdEhtc3RjYkRkWUkyeXJySXJKODhmaGl0MQ=='
+  //   };
 
-    var request = http.Request(
-        'GET', Uri.parse('https://api.countrystatecity.in/v1/countries'));
+  //   var request = http.Request(
+  //       'GET', Uri.parse('https://api.countrystatecity.in/v1/countries'));
 
-    request.headers.addAll(headers);
+  //   request.headers.addAll(headers);
 
-    http.StreamedResponse response = await request.send();
-    List<LocationModel> result = [];
-    if (response.statusCode == 200) {
-      result = locationsFromMap(await response.stream.bytesToString());
-    } else {
-      print(response.reasonPhrase);
-    }
+  //   http.StreamedResponse response = await request.send();
+  //   List<LocationModel> result = [];
+  //   if (response.statusCode == 200) {
+  //     result = locationsFromMap(await response.stream.bytesToString());
+  //   } else {
+  //     print(response.reasonPhrase);
+  //   }
 
-    return result;
-  }
+  //   return result;
+  // }
 
   Future<List<LocationModel>> loadCountries() async {
     final bytes = await rootBundle.load('assets/tables/countryTable.xlsx');

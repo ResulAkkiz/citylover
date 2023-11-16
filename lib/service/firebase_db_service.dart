@@ -1,10 +1,11 @@
+import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseDbService {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore = locator<FirebaseFirestore>();
 
   Future<List<UserModel>> readAllUsers() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =

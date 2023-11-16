@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/sharingmodel.dart';
@@ -16,9 +17,10 @@ class UserViewModel extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
   UserModel? get firebaseUser => _firebaseUser;
-  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
-  FirebaseDbService firebaseDbService = FirebaseDbService();
-  FirebaseStorageService firebaseStorageService = FirebaseStorageService();
+  FirebaseAuthService firebaseAuthService = locator.get<FirebaseAuthService>();
+  FirebaseDbService firebaseDbService = locator.get<FirebaseDbService>();
+  FirebaseStorageService firebaseStorageService =
+      locator.get<FirebaseStorageService>();
 
   UserViewModel() {
     debugPrint('userviewmodel constructor method tetiklendi');

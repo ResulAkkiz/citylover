@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -791,29 +790,5 @@ class SelectedAssetWidget extends StatelessWidget {
             : const SizedBox.shrink();
       },
     );
-  }
-}
-
-class MediaServices {
-  static Future<List<AssetPathEntity>> loadAlbums(
-      RequestType requestType) async {
-    var permission = await Permission.storage.request();
-    List<AssetPathEntity> albumList = [];
-    if (permission.isGranted) {
-      albumList = await PhotoManager.getAssetPathList(type: requestType);
-    } else {
-      PhotoManager.openSetting();
-    }
-    return albumList;
-  }
-
-  static Future<List<AssetEntity>> loadAssets(
-      AssetPathEntity selectedAlbum, int start, int end) async {
-    List<AssetEntity> assetList =
-        await selectedAlbum.getAssetListRange(start: start, end: end);
-    await PhotoCachingManager().requestCacheAssets(
-        assets: assetList,
-        option: const ThumbnailOption(size: ThumbnailSize.square(50)));
-    return assetList;
   }
 }

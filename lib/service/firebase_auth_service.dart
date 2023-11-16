@@ -1,3 +1,4 @@
+import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 String errorMessage = '';
 
 class FirebaseAuthService {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth firebaseAuth = locator<FirebaseAuth>();
 
   Future<UserModel?> createEmailPassword({
     required String email,
