@@ -91,6 +91,14 @@ class FirebaseDbService {
     return commentList;
   }
 
+  Future<int> getCommentCount(String sharingID) async {
+    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+        await firestore.collection('comments').doc(sharingID).get();
+    Map<String, dynamic>? commentsMap = documentSnapshot.data();
+    int commentCount = commentsMap?.length ?? 0;
+    return commentCount;
+  }
+
   Future<bool> updateUser(String userId, Map<String, dynamic> newMap) async {
     firestore.collection('users').doc(userId).update(newMap);
     return true;

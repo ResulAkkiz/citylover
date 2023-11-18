@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => AddSharingViewModel(),
-        )
+        ),
       ],
       child: MaterialApp(
         theme: customTheme,
