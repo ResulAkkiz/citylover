@@ -2,19 +2,15 @@ import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/image_enums.dart';
 import 'package:citylover/app_contants/theme_colors.dart';
 import 'package:citylover/common_widgets/custom_model_sheet.dart';
-import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/sharingmodel.dart';
-import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
 import 'package:citylover/pages/profilepage/other_profile_page.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
-import 'package:citylover/viewmodel/place_view_model.dart';
+import 'package:citylover/viewmodel/home_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../../viewmodel/user_view_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,26 +20,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isSharingListReady = false;
-  bool isUserReady = false;
-  UserModel? user;
-  late PlaceViewModel placeViewModel;
-  List<SharingModel> sharingList = [];
   @override
   void initState() {
-    getSharingsbyLocation();
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    placeViewModel = Provider.of<PlaceViewModel>(context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context);
+    final homeViewModel = Provider.of<HomeViewModel>(context);
+
     return WillPopScope(
       onWillPop: () async {
         return await showDialog(
@@ -70,7 +60,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         floatingActionButton: Visibility(
-          visible: userViewModel.firebaseUser != null,
+          visible: homeViewModel.user != null,
           child: const FloatingActionButton(),
         ),
         backgroundColor: Colors.white,
@@ -83,304 +73,216 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const DrawerButton(),
-                  LocationTitleWidget(placeViewModel: placeViewModel)
+                  LocationTitleWidget(homeViewModel)
                 ],
               ),
             ),
           ),
         ),
         drawer: const DrawerWidget(),
-        body: isSharingListReady
-            ? RefreshIndicator(
-                onRefresh: () async {
-                  return await userViewModel.getSharingsbyLocation(
-                      placeViewModel.country!.name, placeViewModel.city!.name);
-                },
-                child: SafeArea(
-                  child: Center(
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.all(12.0),
-                      itemBuilder: (context, index) {
-                        SharingModel currentSharing =
-                            userViewModel.sharingList[index];
-                        return FutureBuilder<UserModel?>(
-                            future:
-                                userViewModel.readUser(currentSharing.userID),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<UserModel?> snapshot) {
-                              if (snapshot.hasData) {
-                                var currentUser = snapshot.data;
-                                return Stack(
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 20),
-                                      margin: const EdgeInsets.only(
-                                          bottom: 20, top: 10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.only(
-                                              bottomRight:
-                                                  Radius.elliptical(25, 25),
-                                              topLeft:
-                                                  Radius.elliptical(25, 25)),
-                                          color: ThemeColors.background200,
-                                          boxShadow: [
-                                            BoxShadow(
-                                                blurRadius: 2,
-                                                color:
-                                                    ThemeColors.background400,
-                                                offset: const Offset(2, 2))
-                                          ],
-                                          border: Border.all(
-                                              width: 2,
-                                              color:
-                                                  ThemeColors.background500)),
-                                      child: ListTile(
-                                        onTap: () {
-                                          Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                DetailSharingPage(
-                                                    userModel: currentUser!,
-                                                    sharingModel:
-                                                        currentSharing),
-                                          ));
-                                        },
-                                        leading: InkWell(
-                                          onTap: () {
-                                            Navigator.of(context)
-                                                .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  OtherUserProfilePage(
-                                                      userID:
-                                                          currentUser!.userID),
-                                            ));
-                                          },
-                                          child: CircleAvatar(
-                                            radius: 28,
-                                            backgroundImage: AssetImage(
-                                                ImageEnum.user.toPath),
-                                          ),
-                                        ),
-                                        title: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              currentSharing.sharingContent,
-                                              style: TextStyle(
-                                                overflow: TextOverflow.ellipsis,
-                                                color: ThemeColors.textGrey400,
-                                                fontSize: 15,
-                                              ),
-                                              maxLines: 3,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                SharingDateWidget(
-                                                    currentSharing:
-                                                        currentSharing),
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.comment,
-                                                      size: 16,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 4,
-                                                    ),
-                                                    FutureBuilder(
-                                                        future: userViewModel
-                                                            .getCommentsList(
-                                                                currentSharing
-                                                                    .sharingID),
-                                                        builder: (context,
-                                                            AsyncSnapshot
-                                                                snapshot) {
-                                                          if (snapshot
-                                                              .hasData) {
-                                                            List<CommentModel>
-                                                                commentList =
-                                                                snapshot.data;
-                                                            int listLength =
-                                                                commentList
-                                                                    .length;
-                                                            return Text(
-                                                              listLength
-                                                                  .toString(),
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .black54,
-                                                                fontSize: 12,
-                                                              ),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return Center(
-                                                                child: Text(snapshot
-                                                                    .error
-                                                                    .toString()));
-                                                          } else {
-                                                            return const Center(
-                                                              child:
-                                                                  CircularProgressIndicator(),
-                                                            );
-                                                          }
-                                                        }),
-                                                    Builder(
-                                                      builder: (context) {
-                                                        if (userViewModel
-                                                                .firebaseUser !=
-                                                            null) {
-                                                          if (currentSharing
-                                                                  .userID !=
-                                                              userViewModel
-                                                                  .firebaseUser!
-                                                                  .userID) {
-                                                            return IconButton(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              onPressed:
-                                                                  () async {
-                                                                bool response = await buildShowDialog(
-                                                                        context,
-                                                                        const Text(
-                                                                            'Uyarı'),
-                                                                        const Text(
-                                                                            'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
-                                                                    false;
-                                                                if (response) {
-                                                                  bool
-                                                                      isSuccessful =
-                                                                      await userViewModel
-                                                                          .reportSharing(
-                                                                              currentSharing);
-                                                                  debugPrint(
-                                                                      isSuccessful
-                                                                          .toString());
-                                                                  if (isSuccessful &&
-                                                                      mounted) {
-                                                                    buildShowModelBottomSheet(
-                                                                        context,
-                                                                        'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
-                                                                        Icons
-                                                                            .report_problem);
-                                                                  }
-                                                                }
-                                                              },
-                                                              constraints:
-                                                                  const BoxConstraints(),
-                                                              icon: const Icon(
-                                                                Icons
-                                                                    .report_problem_outlined,
-                                                                size: 14,
-                                                              ),
-                                                            );
-                                                          } else {
-                                                            return IconButton(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              onPressed:
-                                                                  () async {
-                                                                bool response = await buildShowDialog(
-                                                                        context,
-                                                                        const Text(
-                                                                            'Uyarı'),
-                                                                        const Text(
-                                                                            'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
-                                                                    false;
+        body: RefreshIndicator(
+          onRefresh: () async {
+            return await homeViewModel.getSharingsbyLocation();
+          },
+          child: SafeArea(
+            child: Center(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(12.0),
+                itemCount: homeViewModel.homeSharingList.length,
+                itemBuilder: (context, index) {
+                  SharingModel currentSharing =
+                      homeViewModel.homeSharingList[index];
+                  var currentUser =
+                      homeViewModel.sharingUserList[currentSharing];
 
-                                                                if (response) {
-                                                                  bool
-                                                                      isSuccesful =
-                                                                      await userViewModel
-                                                                          .deleteSharing(
-                                                                              currentSharing);
-                                                                  if (isSuccesful &&
-                                                                      mounted) {
-                                                                    buildShowModelBottomSheet(
-                                                                        context,
-                                                                        'Paylaşım silme işlemi başarıyla gerçekleşti.',
-                                                                        Icons
-                                                                            .check);
-                                                                  }
-                                                                }
-                                                              },
-                                                              constraints:
-                                                                  const BoxConstraints(),
-                                                              icon: const Icon(
-                                                                Icons.clear,
-                                                                size: 14,
-                                                              ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          return const SizedBox();
-                                                        }
-                                                      },
-                                                    )
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            const SharingImageWidget()
-                                          ],
-                                        ).separated(const SizedBox(
-                                          height: 0,
-                                        )),
+                  var listLength =
+                      homeViewModel.sharingCommentCount[currentSharing];
+                  return Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        margin: const EdgeInsets.only(bottom: 20, top: 10),
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                                bottomRight: Radius.elliptical(25, 25),
+                                topLeft: Radius.elliptical(25, 25)),
+                            color: ThemeColors.background200,
+                            boxShadow: [
+                              BoxShadow(
+                                  blurRadius: 2,
+                                  color: ThemeColors.background400,
+                                  offset: const Offset(2, 2))
+                            ],
+                            border: Border.all(
+                                width: 2, color: ThemeColors.background500)),
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => DetailSharingPage(
+                                  userModel: currentUser!,
+                                  sharingModel: currentSharing),
+                            ));
+                          },
+                          leading: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => OtherUserProfilePage(
+                                    userID: currentUser!.userID),
+                              ));
+                            },
+                            child: CircleAvatar(
+                              radius: 28,
+                              backgroundImage:
+                                  AssetImage(ImageEnum.user.toPath),
+                            ),
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                currentSharing.sharingContent,
+                                style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  color: ThemeColors.textGrey400,
+                                  fontSize: 15,
+                                ),
+                                maxLines: 3,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SharingDateWidget(
+                                      currentSharing: currentSharing),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.comment,
+                                        size: 16,
                                       ),
-                                    ),
-                                    const RateButtonsWidget()
-                                  ],
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text(snapshot.error.toString()),
-                                );
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                            });
-                      },
-                      itemCount: userViewModel.sharingList.length,
-                    ),
-                  ),
-                ),
-              )
-            : const Center(
-                child: CircularProgressIndicator(),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      Text(
+                                        listLength.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      ReportDeleteButtonWidget(
+                                          homeViewModel, currentSharing)
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SharingImageWidget()
+                            ],
+                          ).separated(const SizedBox(
+                            height: 0,
+                          )),
+                        ),
+                      ),
+                      const RateButtonsWidget()
+                    ],
+                  );
+                },
               ),
+            ),
+          ),
+        ),
       ),
     );
   }
+}
 
-  Future<void> getSharingsbyLocation() async {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    final placeViewModel = Provider.of<PlaceViewModel>(context, listen: false);
-    if (userViewModel.firebaseUser != null) {
-      user = await userViewModel.readUser(userViewModel.firebaseUser!.userID);
-      isUserReady = true;
-      placeViewModel.savePlace(
-          cityName: user!.lastState!, countryName: user!.lastCountry!);
-      placeViewModel.loadStates(user!.lastCountry!.id);
-      setState(() {});
+class ReportDeleteButtonWidget extends StatefulWidget {
+  const ReportDeleteButtonWidget(this._homeViewModel, this._sharingModel,
+      {super.key});
+  final SharingModel _sharingModel;
+  final HomeViewModel _homeViewModel;
+
+  @override
+  State<ReportDeleteButtonWidget> createState() =>
+      _ReportDeleteButtonWidgetState();
+}
+
+class _ReportDeleteButtonWidgetState extends State<ReportDeleteButtonWidget> {
+  late HomeViewModel _homeViewModel;
+  late SharingModel _sharingModel;
+  @override
+  void initState() {
+    _homeViewModel = widget._homeViewModel;
+    _sharingModel = widget._sharingModel;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_homeViewModel.user != null) {
+      if (_sharingModel.userID != _homeViewModel.user!.userID) {
+        return IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () async {
+            bool response = await buildShowDialog(
+                    context,
+                    const Text('Uyarı'),
+                    const Text(
+                        'Seçmiş olduğunuz paylaşımı, raporlamak istediğinizden emin misiniz ?')) ??
+                false;
+            if (response) {
+              bool isSuccessful =
+                  await _homeViewModel.reportSharing(_sharingModel);
+              debugPrint(isSuccessful.toString());
+              if (isSuccessful && mounted) {
+                buildShowModelBottomSheet(
+                    context,
+                    'Raporlama işlemi başarıyla gerçekleşti. İnceleme sonucu gerekli aksiyonlar alınacaktır.',
+                    Icons.report_problem);
+              }
+            }
+          },
+          constraints: const BoxConstraints(),
+          icon: const Icon(
+            Icons.report_problem_outlined,
+            size: 14,
+          ),
+        );
+      } else {
+        return IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () async {
+            bool response = await buildShowDialog(
+                    context,
+                    const Text('Uyarı'),
+                    const Text(
+                        'Seçmiş olduğunuz paylaşımı, silmek istediğinizden emin misiniz ?')) ??
+                false;
+
+            if (response) {
+              bool isSuccesful =
+                  await _homeViewModel.deleteSharing(_sharingModel);
+              if (isSuccesful && mounted) {
+                buildShowModelBottomSheet(
+                    context,
+                    'Paylaşım silme işlemi başarıyla gerçekleşti.',
+                    Icons.check);
+              }
+            }
+          },
+          constraints: const BoxConstraints(),
+          icon: const Icon(
+            Icons.clear,
+            size: 14,
+          ),
+        );
+      }
+    } else {
+      return const SizedBox();
     }
-
-    await userViewModel.getSharingsbyLocation(
-        placeViewModel.country!.name, placeViewModel.city!.name);
-
-    isSharingListReady = true;
   }
 }
 
@@ -407,12 +309,9 @@ class FloatingActionButton extends StatelessWidget {
 }
 
 class LocationTitleWidget extends StatelessWidget {
-  const LocationTitleWidget({
-    super.key,
-    required this.placeViewModel,
-  });
+  const LocationTitleWidget(this._homeViewModel, {super.key});
 
-  final PlaceViewModel placeViewModel;
+  final HomeViewModel _homeViewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -432,7 +331,7 @@ class LocationTitleWidget extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.fitWidth,
         child: Text(
-          '${placeViewModel.country?.name} / ${placeViewModel.city?.name}',
+          '${_homeViewModel.country?.name} / ${_homeViewModel.state?.name}',
           style: TextStyle(
               shadows: [
                 BoxShadow(

@@ -8,6 +8,8 @@ import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/service/firebase_db_service.dart';
 import 'package:flutter/material.dart';
 
+enum ViewModelState { busy, idle }
+
 class HomeViewModel extends ChangeNotifier {
   // FirebaseStorageService firebaseStorageService =
   //     locator.get<FirebaseStorageService>();
@@ -24,8 +26,8 @@ class HomeViewModel extends ChangeNotifier {
   LocationModel? _country;
   LocationModel? get country => _country;
 
-  List<SharingModel>? _homeSharingList;
-  List<SharingModel>? get homeSharingList => _homeSharingList;
+  List<SharingModel> _homeSharingList = [];
+  List<SharingModel> get homeSharingList => _homeSharingList;
 
   final Map<SharingModel, int> _sharingCommentCount = {};
   Map<SharingModel, int> get sharingCommentCount => _sharingCommentCount;
@@ -37,6 +39,7 @@ class HomeViewModel extends ChangeNotifier {
     _user = globalState.user;
     _country = globalState.country;
     _state = globalState.state;
+    getSharingsbyLocation();
   }
 
   Future<UserModel?> readUser(String userId) async {
@@ -50,14 +53,11 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> getSharingsbyLocation() async {
     _homeSharingList = await firebaseDbService.getSharingsbyLocation(
         country!.name, state!.name);
-    if (_homeSharingList != null) {
-      for (SharingModel element in _homeSharingList!) {
-        _sharingUserList[element] = await readUser(element.userID);
-        _sharingCommentCount[element] =
-            await getCommentCount(element.sharingID);
-      }
-      log(_homeSharingList!.length.toString());
+    for (SharingModel element in _homeSharingList) {
+      _sharingUserList[element] = await readUser(element.userID);
+      _sharingCommentCount[element] = await getCommentCount(element.sharingID);
     }
+    log(_homeSharingList.length.toString());
     notifyListeners();
   }
 
