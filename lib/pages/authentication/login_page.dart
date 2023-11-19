@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/app_contants/image_enums.dart';
@@ -8,6 +10,7 @@ import 'package:citylover/common_widgets/icon_elevated_button.dart';
 import 'package:citylover/pages/landingpage/landing_page.dart';
 import 'package:citylover/pages/resetPassword/reset_password_page.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
+import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final userViewModel = Provider.of<UserViewModel>(context);
+    final placeViewModel = Provider.of<PlaceViewModel>(context);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -175,16 +179,19 @@ class _LoginPageState extends State<LoginPage> {
                                       await userViewModel.signInEmailPassword(
                                           emailController.text,
                                           passwordController.text);
+                                  log((user != null).toString());
                                   if (userViewModel.firebaseUser != null) {
                                     var usermodel = await userViewModel
                                         .readUser(user!.userID);
-                                    if (mounted && usermodel!.status!) {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LandingScreen()),
-                                          (Route<dynamic> route) => false);
+
+                                    placeViewModel.savePlace(
+                                        cityName: usermodel!.lastState!,
+                                        countryName: usermodel.lastCountry!);
+
+                                    log(usermodel.toString());
+
+                                    if (mounted && usermodel.status!) {
+                                      log("Navigator prosess");
                                     } else {
                                       await userViewModel.signOut();
                                       if (mounted) {

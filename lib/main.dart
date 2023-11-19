@@ -1,7 +1,8 @@
 import 'package:citylover/app_contants/custom_theme.dart';
 import 'package:citylover/locator/locator.dart';
 import 'package:citylover/pages/splashpage/splash_page.dart';
-import 'package:citylover/viewmodel/add_sharing_viewmodel.dart';
+import 'package:citylover/viewmodel/add_sharing_view_model.dart';
+import 'package:citylover/viewmodel/home_view_model.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => AddSharingViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HomeViewModel(),
         ),
       ],
       child: MaterialApp(

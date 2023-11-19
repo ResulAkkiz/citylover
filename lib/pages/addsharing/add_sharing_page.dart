@@ -10,7 +10,7 @@ import 'package:citylover/common_widgets/custom_back_button.dart';
 import 'package:citylover/models/sharingmodel.dart';
 import 'package:citylover/models/usermodel.dart';
 import 'package:citylover/pages/homepage/home_page.dart';
-import 'package:citylover/viewmodel/add_sharing_viewmodel.dart';
+import 'package:citylover/viewmodel/add_sharing_view_model.dart';
 import 'package:citylover/viewmodel/place_view_model.dart';
 import 'package:citylover/viewmodel/user_view_model.dart';
 import 'package:flutter/cupertino.dart';

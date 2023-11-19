@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:citylover/app_contants/app_extensions.dart';
 import 'package:citylover/app_contants/image_enums.dart';
 import 'package:citylover/app_contants/theme_colors.dart';
@@ -7,7 +9,7 @@ import 'package:citylover/pages/addsharing/add_sharing_page.dart';
 import 'package:citylover/pages/homepage/widgets/drawer_widget.dart';
 import 'package:citylover/pages/profilepage/other_profile_page.dart';
 import 'package:citylover/pages/sharingdetail/detail_sharing_page.dart';
-import 'package:citylover/viewmodel/home_viewmodel.dart';
+import 'package:citylover/viewmodel/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -21,18 +23,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    log("Homepage Build.");
     final homeViewModel = Provider.of<HomeViewModel>(context);
+    homeViewModel.getSharingsbyLocation();
 
     return WillPopScope(
       onWillPop: () async {
@@ -134,8 +128,11 @@ class _HomePageState extends State<HomePage> {
                             },
                             child: CircleAvatar(
                               radius: 28,
-                              backgroundImage:
-                                  AssetImage(ImageEnum.user.toPath),
+                              backgroundImage: (currentUser != null &&
+                                      currentUser.userProfilePict != null)
+                                  ? NetworkImage(currentUser.userProfilePict!)
+                                  : AssetImage(ImageEnum.user.toPath)
+                                      as ImageProvider,
                             ),
                           ),
                           title: Column(

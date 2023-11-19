@@ -1,3 +1,4 @@
+import 'package:citylover/global_state.dart';
 import 'package:citylover/service/country_service.dart';
 import 'package:citylover/service/firebase_auth_service.dart';
 import 'package:citylover/service/firebase_db_service.dart';
@@ -19,4 +20,6 @@ void setupLocator() {
   locator.registerLazySingleton(() => FirebaseFirestore.instance);
   locator.registerLazySingleton(() => FirebaseStorage.instance);
   locator.registerLazySingleton(() => FirebaseAuth.instance);
+
+  locator.registerLazySingleton(() => GlobalState());
 }

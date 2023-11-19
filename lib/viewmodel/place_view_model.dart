@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:citylover/global_state.dart';
 import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/country_model.dart';
 import 'package:citylover/service/country_service.dart';
@@ -5,6 +8,7 @@ import 'package:flutter/material.dart';
 
 class PlaceViewModel extends ChangeNotifier {
   CountryService countryService = locator.get<CountryService>();
+  final GlobalState _globalState = locator.get<GlobalState>();
   LocationModel? _city;
   LocationModel? _country;
   LocationModel? get city => _city;
@@ -12,13 +16,18 @@ class PlaceViewModel extends ChangeNotifier {
   List<LocationModel> countryNameList = [];
   List<LocationModel> stateNameList = [];
 
+  PlaceViewModel() {
+    log("PlaceViewModel Constructor");
+  }
+
   void savePlace({
     required LocationModel cityName,
     required LocationModel countryName,
   }) {
     _city = cityName;
     _country = countryName;
-    notifyListeners();
+    _globalState.country = _country;
+    _globalState.state = _city;
   }
 
   Future<void> loadCountries() async {

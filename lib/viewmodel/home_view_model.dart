@@ -39,7 +39,7 @@ class HomeViewModel extends ChangeNotifier {
     _user = globalState.user;
     _country = globalState.country;
     _state = globalState.state;
-    getSharingsbyLocation();
+    log("HomeViewModel Constructor");
   }
 
   Future<UserModel?> readUser(String userId) async {
@@ -52,7 +52,7 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<void> getSharingsbyLocation() async {
     _homeSharingList = await firebaseDbService.getSharingsbyLocation(
-        country!.name, state!.name);
+        _country!.name, _state!.name);
     for (SharingModel element in _homeSharingList) {
       _sharingUserList[element] = await readUser(element.userID);
       _sharingCommentCount[element] = await getCommentCount(element.sharingID);

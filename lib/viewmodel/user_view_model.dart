@@ -2,6 +2,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:citylover/global_state.dart';
 import 'package:citylover/locator/locator.dart';
 import 'package:citylover/models/commentmodel.dart';
 import 'package:citylover/models/country_model.dart';
@@ -17,11 +18,13 @@ class UserViewModel extends ChangeNotifier {
   UserModel? _firebaseUser;
   UserModel? _user;
   UserModel? get user => _user;
+
   UserModel? get firebaseUser => _firebaseUser;
   FirebaseAuthService firebaseAuthService = locator.get<FirebaseAuthService>();
   FirebaseDbService firebaseDbService = locator.get<FirebaseDbService>();
   FirebaseStorageService firebaseStorageService =
       locator.get<FirebaseStorageService>();
+  final GlobalState _globalState = locator.get<GlobalState>();
 
   UserViewModel() {
     log("UserViewModel Constructor.");
@@ -64,9 +67,10 @@ class UserViewModel extends ChangeNotifier {
     _firebaseUser = await firebaseAuthService.currentUser();
     if (_firebaseUser != null) {
       _user = await firebaseDbService.readUser(_firebaseUser!.userID);
+      _globalState.user = _user;
     }
     notifyListeners();
-    return _firebaseUser;
+    return _user;
   }
 
   Future<UserModel?> signInEmailPassword(String email, String password) async {
@@ -93,9 +97,7 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<UserModel?> readUser(String userId) async {
-    _user = await firebaseDbService.readUser(userId);
-
-    return _user;
+    return await firebaseDbService.readUser(userId);
   }
 
   Future<bool> addSharing(SharingModel sharingModel) async {
@@ -152,6 +154,7 @@ class UserViewModel extends ChangeNotifier {
         _user = await firebaseDbService.readUser(userId);
       }
     }
+    if (_user != null) _globalState.user = user;
     notifyListeners();
     return (_user != null && isCompleted);
   }
